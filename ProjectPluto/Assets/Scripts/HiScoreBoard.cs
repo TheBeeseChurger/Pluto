@@ -5,7 +5,7 @@ public class HiScoreBoard
 {
     static int newest_score = -1;
 
-    private List<Score> board = new List<Score>();
+    private List<Score> board = new();
 
     void AddScore(Score _score)
     {
@@ -36,5 +36,10 @@ public class HiScoreBoard
     void AddScore(string name, int _score)
     {
         AddScore(new Score(_score, name));
+    }
+
+    Score GetScore(int index)
+    {
+        return board[index];
     }
 }
