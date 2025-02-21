@@ -35,10 +35,6 @@ public class HiScoreBoard
 
     void AddScore(string name, int _score)
     {
-        Score my_score = new Score();
-        my_score.name = name;
-        my_score.score = _score;
-
-        AddScore(my_score);
+        AddScore(new Score(_score, name));
     }
 }
