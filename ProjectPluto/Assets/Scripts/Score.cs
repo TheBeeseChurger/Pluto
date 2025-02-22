@@ -10,4 +10,16 @@ public class Score
         this.score = score;
         this.name = name.ToUpper();
     }
+
+    public string GetName()
+    {
+        return this.name;
+    }
+
+    public string GetScore()
+    {
+        string str;
+
+        return str;
+    }
 }

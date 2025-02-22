@@ -40,6 +40,11 @@ public class HiScoreBoard
 
     Score GetScore(int index)
     {
+        if (board.Count <= index)
+        {
+            return new Score(0, "AAA");
+        }
+
         return board[index];
     }
 }
