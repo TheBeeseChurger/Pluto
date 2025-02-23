@@ -13,6 +13,20 @@ public class ScoreManagerScript : MonoBehaviour
 
     Timer timer;
 
+    [Header("Data")]
+    [SerializeField] GameObject prefab;
+    DataScript data;
+    void Awake()
+    {
+        GameObject dataobj = GameObject.FindWithTag("data");
+
+        if (dataobj == null)
+        {
+            dataobj = GameObject.Instantiate(prefab);
+        }
+
+        data = dataobj.GetComponent<DataScript>();
+    }
     void Start()
     {
         dir = new Vector3(0f, scroll_spd, 0f);

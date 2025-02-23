@@ -1,14 +1,17 @@
 using UnityEngine;
-
+using TMPro;
 public class ScoreTextScript : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    Score my_score;
+
+    TextMeshProUGUI text;
+
+    public int rank;
     void Start()
     {
-        
+        text = GetComponentInChildren<TextMeshProUGUI>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         

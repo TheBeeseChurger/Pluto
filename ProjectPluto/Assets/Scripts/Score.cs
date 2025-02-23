@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Score
@@ -18,8 +19,6 @@ public class Score
 
     public string GetScore()
     {
-        string str;
-
-        return str;
+        return this.score.ToString().PadLeft(20, '.');
     }
 }

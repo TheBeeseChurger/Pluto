@@ -47,4 +47,9 @@ public class HiScoreBoard
 
         return board[index];
     }
+
+    bool IsRecent(int index)
+    {
+        return newest_score == index;
+    }
 }
