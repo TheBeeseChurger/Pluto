@@ -16,6 +16,7 @@ public class ScoreManagerScript : MonoBehaviour
     [Header("Data")]
     [SerializeField] GameObject prefab;
     DataScript data;
+
     void Awake()
     {
         GameObject dataobj = GameObject.FindWithTag("data");
@@ -27,6 +28,7 @@ public class ScoreManagerScript : MonoBehaviour
 
         data = dataobj.GetComponent<DataScript>();
     }
+
     void Start()
     {
         dir = new Vector3(0f, scroll_spd, 0f);
@@ -35,12 +37,25 @@ public class ScoreManagerScript : MonoBehaviour
 
         timer.timer_spd = 2;
 
+        data.data.AddScore("DEV", 1348092);
+        data.data.AddScore("COB", 104);
+        data.data.AddScore("KAY", 4);
+
         int pos = 9;
+        int i = 1;
 
         foreach (ScoreTextScript child in gameObject.GetComponentsInChildren<ScoreTextScript>())
         {
             child.transform.localPosition = new Vector3(0f, pos, 0f);
+            
+            child.rank = i;
+
+            child.score = data.data.GetScore(i - 1);
+
+            child.FormatText();
+
             pos += -2;
+            i++;
         }
     }
 

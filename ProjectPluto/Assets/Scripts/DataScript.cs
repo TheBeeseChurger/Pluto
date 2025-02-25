@@ -4,7 +4,8 @@ public class DataScript : MonoBehaviour
 {
     static DataScript script;
 
-    HiScoreBoard data;
+    public HiScoreBoard data = new();
+
     void Awake()
     {
         if (script != null)
@@ -14,11 +15,5 @@ public class DataScript : MonoBehaviour
 
         script = this;
         DontDestroyOnLoad(gameObject);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

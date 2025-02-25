@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class Score
 {
-    public int score;
-    public string name;
+    int score;
+    string name;
 
     public Score(int score, string name)
     {
@@ -19,6 +19,11 @@ public class Score
 
     public string GetScore()
     {
-        return this.score.ToString().PadLeft(20, '.');
+        return this.score.ToString().PadLeft(21, '.');
+    }
+
+    public int GetScoreRaw()
+    {
+        return this.score;
     }
 }

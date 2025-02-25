@@ -7,13 +7,13 @@ public class HiScoreBoard
 
     private List<Score> board = new();
 
-    void AddScore(Score _score)
+    public void AddScore(Score _score)
     {
         int i = 0;
 
         foreach (var row in board)
         {
-            if (row.score < _score.score)
+            if (row.GetScoreRaw() < _score.GetScoreRaw())
             {
                 board.Insert(i, _score);
                 newest_score = i;
@@ -22,9 +22,10 @@ public class HiScoreBoard
             else i++;
         }
 
-        if (board.Count < i)
+        if (board.Count == i)
         {
             board.Add(_score);
+            newest_score = i;
         }
 
         if (board.Count > 10)
@@ -33,12 +34,12 @@ public class HiScoreBoard
         }
     }
 
-    void AddScore(string name, int _score)
+    public void AddScore(string name, int _score)
     {
         AddScore(new Score(_score, name));
     }
 
-    Score GetScore(int index)
+    public Score GetScore(int index)
     {
         if (board.Count <= index)
         {
@@ -48,7 +49,7 @@ public class HiScoreBoard
         return board[index];
     }
 
-    bool IsRecent(int index)
+    public bool IsRecent(int index)
     {
         return newest_score == index;
     }
