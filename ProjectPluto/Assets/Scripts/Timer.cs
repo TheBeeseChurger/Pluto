@@ -5,6 +5,7 @@ public class Timer : MonoBehaviour
     const float DEFAULT_TIME = 1.0f;
 
     public float timer_spd;
+    public float timer_time;
 
     float curtime = DEFAULT_TIME;
 
@@ -24,7 +25,15 @@ public class Timer : MonoBehaviour
             toggle = !toggle;
             end = true;
 
-            curtime = DEFAULT_TIME / timer_spd;
+            if (timer_time == 0)
+            {
+                curtime = DEFAULT_TIME / timer_spd;
+            }
+            else
+            {
+                curtime = timer_time / timer_spd;
+            }
+            
         }
     }
 
@@ -33,6 +42,14 @@ public class Timer : MonoBehaviour
         if (timer_spd == 0) return;
 
         toggle = true;
-        curtime = DEFAULT_TIME / timer_spd;
+
+        if (timer_time == 0)
+        {
+            curtime = DEFAULT_TIME / timer_spd;
+        }
+        else
+        {
+            curtime = timer_time / timer_spd;
+        }
     }
 }
