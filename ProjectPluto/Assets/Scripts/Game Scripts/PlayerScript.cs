@@ -10,39 +10,20 @@ public class PlayerScript : MonoBehaviour
 
     [SerializeField] private float move_speed;
 
-    Timer timer;
-
-    private bool ready = false;
-
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-
-        timer = gameObject.AddComponent<Timer>();
-
-        timer.timer_spd = 2f;
-        timer.timer_time = 1f;
-        
-
-        timer.Interrupt();
     }
 
     void Update()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
         vertical = Input.GetAxisRaw("Vertical");
+    }
 
-        if (timer.end)
-        {
-            ready = true;
-        }
-
-        if ((horizontal != 0 || vertical != 0) && ready)
-        {
-            ready = false;
-            transform.position += new Vector3(horizontal, vertical, 0f);
-            timer.Interrupt();
-        }
+    private void FixedUpdate()
+    {
+        rb.linearVelocity = new Vector2(horizontal * move_speed, vertical * move_speed);
     }
 
 }
