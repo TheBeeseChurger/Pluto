@@ -340,8 +340,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cell: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
-  cell_width: 10
-  cell_length: 10
+  cell_width: 20
+  cell_length: 25
 --- !u!1 &893120341
 GameObject:
   m_ObjectHideFlags: 0
