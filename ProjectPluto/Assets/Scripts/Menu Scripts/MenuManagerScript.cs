@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
 public class MenuManagerScript : MonoBehaviour
@@ -8,6 +9,10 @@ public class MenuManagerScript : MonoBehaviour
     [SerializeField] float time;
 
     [SerializeField] AudioSource song;
+
+    [Header("Quit")]
+    [SerializeField] AudioSource ui;
+    [SerializeField] AudioResource quit;
 
     void Start()
     {
@@ -22,8 +27,12 @@ public class MenuManagerScript : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.Escape))
         {
-            // Play a sound?
-            Application.Quit();
+            
+            ui.resource = quit;
+            ui.time = 5f;
+            ui.Play();
+
+            Invoke(nameof(EndGame), 1.0f);
         }
 
         if (Input.GetKeyUp(KeyCode.Space))
@@ -39,6 +48,16 @@ public class MenuManagerScript : MonoBehaviour
 
     public void ToggleSong()
     {
-        song.enabled = !song.enabled;
+        song.mute = !song.mute;
+    }
+
+    private void EndGame()
+    {
+        #if UNITY_STANDALONE
+                Application.Quit();
+        #endif
+        #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+        #endif
     }
 }

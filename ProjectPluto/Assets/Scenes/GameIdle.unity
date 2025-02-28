@@ -266,26 +266,13 @@ GameObject:
   m_Component:
   - component: {fileID: 574966661}
   - component: {fileID: 574966660}
-  - component: {fileID: 574966659}
   m_Layer: 0
   m_Name: Volume
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &574966659
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 574966658}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1b3104b6b60b5747a32d526a3206c47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_IsActive: 1
 --- !u!114 &574966660
 MonoBehaviour:
   m_ObjectHideFlags: 0

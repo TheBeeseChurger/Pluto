@@ -1003,7 +1003,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1212235615}
   - component: {fileID: 1212235614}
-  - component: {fileID: 1212235613}
   m_Layer: 0
   m_Name: Volume
   m_TagString: Untagged
@@ -1011,18 +1010,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1212235613
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1212235612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1b3104b6b60b5747a32d526a3206c47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1212235614
 MonoBehaviour:
   m_ObjectHideFlags: 0
