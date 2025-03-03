@@ -33,4 +33,10 @@ public class CameraTraceScript : MonoBehaviour
 
         cam.transform.position = new Vector3(new_vec2.x, new_vec2.y, -10f);
     }
+
+    public void CamReset()
+    {
+        transform.position = new Vector3(player.transform.position.x, player.transform.position.y, transform.position.z);
+        cam.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, cam.transform.position.z);
+    }
 }
