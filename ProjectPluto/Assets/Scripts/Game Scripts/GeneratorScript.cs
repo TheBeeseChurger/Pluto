@@ -13,7 +13,7 @@ public class GeneratorScript : MonoBehaviour
 
     private int tile_count;
 
-    [SerializeField] private MazeCellScript[,] maze_grid;
+    private MazeCellScript[,] maze_grid;
 
     [SerializeField] private float clr_percent;
     [SerializeField] private float landmark_percent;
@@ -21,6 +21,8 @@ public class GeneratorScript : MonoBehaviour
     private MazeCellScript player1_spawn;
     private MazeCellScript player2_spawn;
     private MazeCellScript evil_spawn;
+
+    [SerializeField] private GameObject[] landmarks;
 
     private enum NextCellFlags
     {
@@ -54,12 +56,27 @@ public class GeneratorScript : MonoBehaviour
     {
         return evil_spawn;
     }
+
+    public void OverrideCell(MazeCellScript cell, int x, int y)
+    {
+        if (x < 0 || y < 0)
+            return;
+        
+        if (x < cell_width && y < cell_length)
+        {
+            Destroy(maze_grid[x, y].gameObject);
+            maze_grid[x, y] = cell;
+        }
+    }
+
     private void MazeGenerationStage3()
     {
         //Randomly place Landmarks in maze based on size of maze
         int landmark_count;
 
         landmark_count = (int)((tile_count / 4f) * (landmark_percent / 100f));
+
+        Debug.Log("Spawning " +  landmark_count + " landmarks in maze.");
 
         for (int i = 0; i < landmark_count; i++)
         {
@@ -100,6 +117,8 @@ public class GeneratorScript : MonoBehaviour
             ClrWalls(cell2, cell3);
             ClrWalls(cell3, cell4);
             ClrWalls(cell4, cell1);
+
+            SpawnLandmark(randx, randy);
         }
     }
 
@@ -109,6 +128,8 @@ public class GeneratorScript : MonoBehaviour
         int alt_clrs;
 
         alt_clrs = (int)(tile_count * (clr_percent / 100f));
+
+        Debug.Log("Breaking up to " +  alt_clrs + " walls in maze.");
 
         for (int i = 0; i < alt_clrs; i++)
         {
@@ -127,6 +148,8 @@ public class GeneratorScript : MonoBehaviour
         player1_spawn = maze_grid[plyx, plyy];
 
         player2_spawn = FindCellOutOfRange(plyx, plyy, 5);
+
+        evil_spawn = FindCellOutOfRange((int)player2_spawn.transform.localPosition.x, (int)player2_spawn.transform.localPosition.y, 5);
     }
 
     private void MazeGenerationStage1()
@@ -135,6 +158,8 @@ public class GeneratorScript : MonoBehaviour
         maze_grid = new MazeCellScript[cell_width, cell_length];
 
         tile_count = cell_length * cell_width;
+
+        Debug.Log("Generating " + tile_count + " cells in maze.");
 
         transform.position = new Vector3((cell_width / -2f) + 0.5f, (cell_length / -2f) + 0.5f, 0);
 
@@ -152,11 +177,17 @@ public class GeneratorScript : MonoBehaviour
         GenerateCell(null, maze_grid[0, 0]);
     }
 
+    private void SpawnLandmark(int x, int y)
+    {
+        var chosen_landmark = Instantiate(landmarks[Random.Range(0, landmarks.Length)], new Vector3(0, 0, 0), Quaternion.identity);
+
+        chosen_landmark.transform.parent = transform;
+        chosen_landmark.transform.localPosition = new Vector3(x, y, 0);
+    }
+
     private bool EmptyLocation(MazeCellScript bl_cell, MazeCellScript br_cell, MazeCellScript tl_cell, MazeCellScript tr_cell)
     {
-        if (bl_cell.IsLocked || br_cell.IsLocked || tl_cell.IsLocked || tr_cell.IsLocked) return false;
-
-        return true;
+        return !(bl_cell.IsLocked || br_cell.IsLocked || tl_cell.IsLocked || tr_cell.IsLocked);
     }
 
     private MazeCellScript FindCellOutOfRange(int x, int y, int range)
@@ -166,10 +197,18 @@ public class GeneratorScript : MonoBehaviour
         int randx = Random.Range(0, cell_width);
         int randy = Random.Range(0, cell_length);
 
-        while ((randx > x - range && randx < x + range) && (randy > y - range && randy < y + range))
+        int attempts = 3;
+        while ((randx > x - range && randx < x + range) && (randy > y - range && randy < y + range) && attempts > 0)
         {
             randx = Random.Range(0, cell_width);
             randy = Random.Range(0, cell_length);
+
+            attempts--;
+        }
+
+        if (attempts <= 0)
+        {
+            Debug.LogError("Unable to find cell outside of range. Map possibly too small?");
         }
 
         found_cell = maze_grid[randx, randy];
