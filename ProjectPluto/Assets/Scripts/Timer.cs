@@ -9,21 +9,21 @@ public class Timer : MonoBehaviour
 
     float curtime = DEFAULT_TIME;
 
-    public bool toggle = true;
+    public bool Toggle { get; private set; } = true;
 
-    public bool end = false;
+    public bool End { get; private set; } = false;
 
     void Update()
     {
         if (timer_spd == 0) return;
 
         curtime -= Time.deltaTime;
-        end = false;
+        End = false;
 
         if (curtime <= 0)
         {
-            toggle = !toggle;
-            end = true;
+            Toggle = !Toggle;
+            End = true;
 
             if (timer_time == 0)
             {
@@ -41,7 +41,7 @@ public class Timer : MonoBehaviour
     {
         if (timer_spd == 0) return;
 
-        toggle = true;
+        Toggle = true;
 
         if (timer_time == 0)
         {

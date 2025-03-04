@@ -21,6 +21,9 @@ public class MenuManagerScript : MonoBehaviour
         idle_timer.timer_spd = 1f;
         idle_timer.timer_time = time;
         idle_timer.Interrupt();
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Update()
@@ -37,10 +40,10 @@ public class MenuManagerScript : MonoBehaviour
 
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            SceneManager.LoadScene("Game");
+            SceneManager.LoadScene("Intermediary");
         }
 
-        if (idle_timer.end)
+        if (idle_timer.End)
         {
             SceneManager.LoadScene("GameIdle");
         }

@@ -20,7 +20,7 @@ public class IndicatorScript : MonoBehaviour
 
     void Update()
     {
-        if (timer.toggle)
+        if (timer.Toggle)
         {
             Vector3 new_pos = pos + new Vector3(0f, move_dist, 0f);
 

@@ -63,13 +63,13 @@ public class ScoreManagerScript : MonoBehaviour
     {
         if (!scrolling)
         {
-            if (!timer.end) return;
+            if (!timer.End) return;
 
             timer.timer_spd = 2;
             timer.Interrupt();
         }
 
-        if (timer.end)
+        if (timer.End)
         {
             transform.localPosition += dir;
 

@@ -19,7 +19,7 @@ public class BlinkTextScript : MonoBehaviour
 
     void Update()
     {
-        text.enabled = timer.toggle;
+        text.enabled = timer.Toggle;
     }
 
 }

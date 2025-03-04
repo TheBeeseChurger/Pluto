@@ -1,5 +1,8 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class IntermediaryManager : MonoBehaviour
 {
@@ -7,9 +10,15 @@ public class IntermediaryManager : MonoBehaviour
     [SerializeField] GameObject prefab;
     DataScript data;
 
-    string player_name;
+    string player_name = "";
 
+    [Header("Input Box")]
     [SerializeField] TextMeshProUGUI input_box;
+
+    Timer timer;
+
+    [Header("END Button")]
+    [SerializeField] Button end_button;
 
     void Awake()
     {
@@ -21,11 +30,32 @@ public class IntermediaryManager : MonoBehaviour
         }
 
         data = dataobj.GetComponent<DataScript>();
+
+        timer = gameObject.AddComponent<Timer>();
+
+        timer.timer_spd = 1;
+        timer.timer_time = 0.6f;
+        timer.Interrupt();
     }
 
     private void Update()
     {
-        input_box.text = player_name;
+        if (timer.Toggle || player_name.Length >= 3)
+        {
+            input_box.text = player_name;
+        }
+        else
+        {
+            input_box.text = player_name + "_";
+        }
+
+        if (player_name.Length > 0)
+        {
+            end_button.interactable = true;
+        } else
+        {
+            end_button.interactable = false;
+        }
     }
 
     public void KeyboardClick(string key)
@@ -44,7 +74,19 @@ public class IntermediaryManager : MonoBehaviour
         }
     }
 
-    public void Name()
+    public void KeyboardEnd()
+    {
+        while (player_name.Length < 3)
+        {
+            player_name = " " + player_name;
+        }
+
+        Name();
+
+        SceneManager.LoadScene("Game");
+    }
+
+    private void Name()
     {
         data.SetCurrent(new Score(0, player_name));
     }
