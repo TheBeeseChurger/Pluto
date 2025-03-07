@@ -401,6 +401,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   move_speed: 4.84
+  gm: {fileID: 1280212732}
 --- !u!60 &383658865
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -506,7 +507,9 @@ MonoBehaviour:
   clr_percent: 13.6
   landmark_percent: 3.24
   landmarks:
-  - {fileID: 785292130246454966, guid: 0da547406bfa6a64f970a4f8dd8205b2, type: 3}
+  - {fileID: 4935258317985656458, guid: 734bd82c16cef524f90ea63a57359632, type: 3}
+  - {fileID: 7874156754503513882, guid: e707d665336ef9449bbaf485646e6f74, type: 3}
+  - {fileID: 2417435326813884517, guid: 985516c0057096e479893cddb57e0fe7, type: 3}
 --- !u!1 &640894509
 GameObject:
   m_ObjectHideFlags: 0
@@ -751,6 +754,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87588f916a30c384eb419658deb7ec6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gm: {fileID: 1280212732}
 --- !u!1 &893120341
 GameObject:
   m_ObjectHideFlags: 0
@@ -1165,6 +1169,8 @@ MonoBehaviour:
   player1: {fileID: 383658859}
   player2: {fileID: 363395610}
   evil: {fileID: 859911409}
+  score_text: {fileID: 1462856265}
+  prefab: {fileID: 4440593590666671750, guid: 95f7b88562700c74b958bbf17b7deb17, type: 3}
 --- !u!4 &1280212733
 Transform:
   m_ObjectHideFlags: 0
@@ -1237,7 +1243,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Score: '
+  m_text: Score:0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7af2e255328e84e428645c04b93d2a39, type: 2}
   m_sharedMaterial: {fileID: 931287281264430771, guid: 7af2e255328e84e428645c04b93d2a39, type: 2}
@@ -1392,7 +1398,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
+  m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -1406,7 +1412,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1557791241}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 9}
+  m_LocalPosition: {x: 0, y: 0, z: 8}
   m_LocalScale: {x: 0.011100332, y: 0.011100332, z: 0.011100332}
   m_ConstrainProportionsScale: 0
   m_Children:

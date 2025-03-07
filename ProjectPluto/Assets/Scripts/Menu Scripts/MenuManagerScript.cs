@@ -8,14 +8,21 @@ public class MenuManagerScript : MonoBehaviour
 
     [SerializeField] float time;
 
-    [SerializeField] AudioSource song;
+    private GameObject audio_head;
+
+    AudioSource song;
+    AudioSource ui;
 
     [Header("Quit")]
-    [SerializeField] AudioSource ui;
     [SerializeField] AudioResource quit;
 
     void Start()
     {
+        audio_head = GameObject.Find("Audio");
+
+        song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
+        ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
+
         idle_timer = gameObject.AddComponent<Timer>();
 
         idle_timer.timer_spd = 1f;

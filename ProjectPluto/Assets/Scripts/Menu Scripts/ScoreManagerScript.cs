@@ -37,10 +37,6 @@ public class ScoreManagerScript : MonoBehaviour
 
         timer.timer_spd = 2;
 
-        data.data.AddScore("DEV", 1348092);
-        data.data.AddScore("COB", 104);
-        data.data.AddScore("KAY", 4);
-
         int pos = 9;
         int i = 1;
 

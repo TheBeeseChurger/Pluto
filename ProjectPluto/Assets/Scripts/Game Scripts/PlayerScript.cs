@@ -10,6 +10,8 @@ public class PlayerScript : MonoBehaviour
 
     [SerializeField] private float move_speed;
 
+    [SerializeField] GameManager gm;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -37,7 +39,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (collision.collider.CompareTag("Player") || collision.collider.CompareTag("Player2"))
         {
-            Debug.Log("Win!");
+            gm.NextRound();
         }
     }
 

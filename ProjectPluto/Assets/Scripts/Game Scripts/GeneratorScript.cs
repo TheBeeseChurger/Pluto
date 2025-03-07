@@ -57,6 +57,11 @@ public class GeneratorScript : MonoBehaviour
         return evil_spawn;
     }
 
+    public MazeCellScript GetCell(int x, int y)
+    {
+        return maze_grid[x, y];
+    }
+
     public void OverrideCell(MazeCellScript cell, int x, int y)
     {
         if (x < 0 || y < 0)
@@ -150,6 +155,10 @@ public class GeneratorScript : MonoBehaviour
         player2_spawn = FindCellOutOfRange(plyx, plyy, 5);
 
         evil_spawn = FindCellOutOfRange((int)player2_spawn.transform.localPosition.x, (int)player2_spawn.transform.localPosition.y, 5);
+
+        player1_spawn.See();
+        player2_spawn.See();
+        evil_spawn.See();
     }
 
     private void MazeGenerationStage1()
@@ -183,6 +192,8 @@ public class GeneratorScript : MonoBehaviour
 
         chosen_landmark.transform.parent = transform;
         chosen_landmark.transform.localPosition = new Vector3(x, y, 0);
+
+        chosen_landmark.GetComponent<LandmarkCellScript>().Initialize();
     }
 
     private bool EmptyLocation(MazeCellScript bl_cell, MazeCellScript br_cell, MazeCellScript tl_cell, MazeCellScript tr_cell)
