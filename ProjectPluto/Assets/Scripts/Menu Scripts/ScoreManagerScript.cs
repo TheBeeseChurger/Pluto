@@ -15,18 +15,21 @@ public class ScoreManagerScript : MonoBehaviour
 
     [Header("Data")]
     [SerializeField] GameObject prefab;
-    DataScript data;
+    static DataScript data;
 
     void Awake()
     {
-        GameObject dataobj = GameObject.FindWithTag("data");
-
-        if (dataobj == null)
+        if (data == null)
         {
-            dataobj = GameObject.Instantiate(prefab);
-        }
+            GameObject dataobj = GameObject.FindWithTag("data");
 
-        data = dataobj.GetComponent<DataScript>();
+            if (dataobj == null)
+            {
+                dataobj = GameObject.Instantiate(prefab);
+            }
+
+            data = dataobj.GetComponent<DataScript>();
+        }
     }
 
     void Start()

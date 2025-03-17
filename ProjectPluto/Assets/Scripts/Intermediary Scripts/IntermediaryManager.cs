@@ -8,7 +8,7 @@ public class IntermediaryManager : MonoBehaviour
 {
     [Header("Data")]
     [SerializeField] GameObject prefab;
-    DataScript data;
+    static DataScript data;
 
     string player_name = "";
 
@@ -22,14 +22,18 @@ public class IntermediaryManager : MonoBehaviour
 
     void Awake()
     {
-        GameObject dataobj = GameObject.FindWithTag("data");
-
-        if (dataobj == null)
+        if (data == null)
         {
-            dataobj = GameObject.Instantiate(prefab);
-        }
+            GameObject dataobj = GameObject.FindWithTag("data");
 
-        data = dataobj.GetComponent<DataScript>();
+            if (dataobj == null)
+            {
+                dataobj = GameObject.Instantiate(prefab);
+            }
+
+            data = dataobj.GetComponent<DataScript>();
+        }
+        
 
         timer = gameObject.AddComponent<Timer>();
 

@@ -401,4 +401,30 @@ public class GeneratorScript : MonoBehaviour
             yield return maze_grid[x, y - 1];
         }
     }
+
+    public IEnumerable<MazeCellScript> GetConnectedCells(MazeCellScript curr_cell)
+    {
+        int x = (int)curr_cell.transform.localPosition.x;
+        int y = (int)curr_cell.transform.localPosition.y;
+
+        if (curr_cell.IsWallClr(MazeCellScript.WallType.Right) && x + 1 < cell_width)
+        {
+            yield return maze_grid[x + 1, y];
+        }
+
+        if (curr_cell.IsWallClr(MazeCellScript.WallType.Left) && x - 1 >= 0)
+        {
+            yield return maze_grid[x - 1, y];
+        }
+
+        if (curr_cell.IsWallClr(MazeCellScript.WallType.Top) && y + 1 < cell_length)
+        {
+            yield return maze_grid[x, y + 1];
+        }
+
+        if (curr_cell.IsWallClr(MazeCellScript.WallType.Bottom) && y - 1 >= 0)
+        {
+            yield return maze_grid[x, y - 1];
+        }
+    }
 }

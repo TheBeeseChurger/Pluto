@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,6 +14,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI score_text;
     private static int score = 110;
+    private static float score_multiplier = 1f;
 
     private Timer timer;
 
@@ -21,19 +23,22 @@ public class GameManager : MonoBehaviour
 
     [Header("Data")]
     [SerializeField] GameObject prefab;
-    DataScript data;
+    static DataScript data;
 
     private void Awake()
     {
-        GameObject dataobj = GameObject.FindWithTag("data");
-
-        if (dataobj == null)
+        if (data == null)
         {
-            dataobj = GameObject.Instantiate(prefab);
+            GameObject dataobj = GameObject.FindWithTag("data");
+
+            if (dataobj == null)
+            {
+                dataobj = GameObject.Instantiate(prefab);
+            }
+
+            data = dataobj.GetComponent<DataScript>();
         }
 
-        data = dataobj.GetComponent<DataScript>();
-        
         timer = gameObject.AddComponent<Timer>();
 
         timer.timer_spd = 1f;
@@ -58,6 +63,25 @@ public class GameManager : MonoBehaviour
 
         x_pos = (int)start_pos.x;
         y_pos = (int)start_pos.y;
+
+        if (!maze_gen.GetCell(x_pos, y_pos).IsLandmarkCell)
+        {
+            maze_gen.GetCell(x_pos, y_pos).See();
+        }
+        else
+        {
+            maze_gen.GetCell(x_pos, y_pos).GetComponentInParent<LandmarkCellScript>().See();
+        }
+
+        IEnumerable<MazeCellScript> cells = maze_gen.GetConnectedCells(maze_gen.GetCell(x_pos, y_pos));
+
+        foreach (var cell in cells)
+        {
+            if (!cell.IsSeen)
+            {
+                SeeAndScore(cell);
+            }
+        }
     }
 
     void Update()
@@ -78,14 +102,16 @@ public class GameManager : MonoBehaviour
 
             if (!maze_gen.GetCell(x_pos, y_pos).IsSeen)
             {
-                maze_gen.GetCell(x_pos, y_pos).See();
+                SeeAndScore(maze_gen.GetCell(x_pos, y_pos));
+            }
 
-                if (maze_gen.GetCell(x_pos, y_pos).IsLandmarkCell)
+            IEnumerable<MazeCellScript> cells = maze_gen.GetConnectedCells(maze_gen.GetCell(x_pos, y_pos));
+
+            foreach (var cell in cells)
+            {
+                if (!cell.IsSeen)
                 {
-                    score += 100;
-                } else
-                {
-                    score += 10;
+                    SeeAndScore(cell);
                 }
             }
         }
@@ -95,6 +121,7 @@ public class GameManager : MonoBehaviour
     {
         data.AddScore(score);
         data.CommitScore();
+        ResetScore();
 
         SceneManager.LoadScene("Menu");
         //END GAME
@@ -102,9 +129,8 @@ public class GameManager : MonoBehaviour
 
     public void NextRound()
     {
-        score += 500;
-
-        data.AddScore(score);
+        score += (int)(500 * score_multiplier);
+        score_multiplier += 0.5f;
 
         SceneManager.LoadScene("Game");
     }
@@ -117,5 +143,25 @@ public class GameManager : MonoBehaviour
     private Vector2 CalcMazePos(float x, float y)
     {
         return new Vector2(x - maze_gen.transform.position.x + 0.5f, y - maze_gen.transform.position.y + 0.5f);
+    }
+
+    private void ResetScore()
+    {
+        score = 110;
+        score_multiplier = 1;
+    }
+
+    private void SeeAndScore(MazeCellScript cell)
+    {
+        cell.See();
+
+        if (cell.IsLandmarkCell)
+        {
+            score += (int)(100 * score_multiplier);
+        }
+        else
+        {
+            score += (int)(10 * score_multiplier);
+        }
     }
 }

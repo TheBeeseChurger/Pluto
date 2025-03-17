@@ -30,7 +30,7 @@ public class MazeCellScript : MonoBehaviour
 
     public void See()
     {
-        if (GetComponentInParent<LandmarkCellScript>() != null)
+        if (IsLandmarkCell)
         {
             GetComponentInParent<LandmarkCellScript>().See();
         }

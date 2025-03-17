@@ -6,6 +6,7 @@ TagManager:
   tags:
   - data
   - Player2
+  - audio
   layers:
   - Default
   - TransparentFX

@@ -8,7 +8,9 @@ public class MenuManagerScript : MonoBehaviour
 
     [SerializeField] float time;
 
-    private GameObject audio_head;
+    [Header("Audio")]
+    [SerializeField] GameObject prefab;
+    static GameObject audio_head;
 
     AudioSource song;
     AudioSource ui;
@@ -18,7 +20,15 @@ public class MenuManagerScript : MonoBehaviour
 
     void Start()
     {
-        audio_head = GameObject.Find("Audio");
+        if (audio_head == null)
+        { 
+            audio_head = GameObject.FindGameObjectWithTag("audio");
+
+            if (audio_head == null)
+            {
+                audio_head = Instantiate(prefab);
+            }
+        }
 
         song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
         ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
