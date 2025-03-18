@@ -135,7 +135,7 @@ PrefabInstance:
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: ceiling
       value: 
-      objectReference: {fileID: 3162706831502643147}
+      objectReference: {fileID: 7820359286283154415}
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: <IsLandmarkCell>k__BackingField
       value: 1
@@ -222,7 +222,7 @@ PrefabInstance:
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: ceiling
       value: 
-      objectReference: {fileID: 3162706831502643147}
+      objectReference: {fileID: 7820359286283154415}
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: <IsLandmarkCell>k__BackingField
       value: 1
@@ -476,9 +476,9 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1203495111087679037, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
   m_PrefabInstance: {fileID: 4292506428194665765}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &3162706831502643147 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1186200156034644718, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
+--- !u!212 &7820359286283154415 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 6275049803311875786, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
   m_PrefabInstance: {fileID: 4292506428194665765}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6536098012268230780
@@ -492,7 +492,7 @@ PrefabInstance:
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: ceiling
       value: 
-      objectReference: {fileID: 3162706831502643147}
+      objectReference: {fileID: 7820359286283154415}
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: <IsLandmarkCell>k__BackingField
       value: 1
@@ -579,7 +579,7 @@ PrefabInstance:
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: ceiling
       value: 
-      objectReference: {fileID: 3162706831502643147}
+      objectReference: {fileID: 7820359286283154415}
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: <IsLandmarkCell>k__BackingField
       value: 1

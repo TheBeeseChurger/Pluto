@@ -137,11 +137,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73c8a77a6146ac04f92d3273901c72dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <IsLandmarkCell>k__BackingField: 0
   l_wall: {fileID: 6698831545193742511}
   r_wall: {fileID: 6283626175331391744}
   t_wall: {fileID: 9152875519898856892}
   b_wall: {fileID: 6561528755354219123}
-  ceiling: {fileID: 1186200156034644718}
+  ceiling: {fileID: 6275049803311875786}
 --- !u!1 &6136077759156270242
 GameObject:
   m_ObjectHideFlags: 0

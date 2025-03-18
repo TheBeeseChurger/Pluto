@@ -404,8 +404,19 @@ public class GeneratorScript : MonoBehaviour
 
     public IEnumerable<MazeCellScript> GetConnectedCells(MazeCellScript curr_cell)
     {
-        int x = (int)curr_cell.transform.localPosition.x;
-        int y = (int)curr_cell.transform.localPosition.y;
+        int x;
+        int y;
+
+        if (!curr_cell.IsLandmarkCell)
+        {
+            x = (int)curr_cell.transform.localPosition.x;
+            y = (int)curr_cell.transform.localPosition.y;
+        }
+        else
+        {
+            x = (int)(curr_cell.transform.parent.localPosition.x + curr_cell.transform.localPosition.x);
+            y = (int)(curr_cell.transform.parent.localPosition.y + curr_cell.transform.localPosition.y);
+        }
 
         if (curr_cell.IsWallClr(MazeCellScript.WallType.Right) && x + 1 < cell_width)
         {

@@ -1,3 +1,5 @@
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MazeCellScript : MonoBehaviour
@@ -11,7 +13,7 @@ public class MazeCellScript : MonoBehaviour
     [SerializeField] private GameObject b_wall;
 
     [Header("Ceiling")]
-    [SerializeField] private GameObject ceiling;
+    [SerializeField] private SpriteRenderer ceiling;
 
     public bool IsSeen { get; private set; }
     public bool IsVisited { get; private set; }
@@ -30,13 +32,16 @@ public class MazeCellScript : MonoBehaviour
 
     public void See()
     {
-        if (IsLandmarkCell)
+        if (!IsSeen)
         {
-            GetComponentInParent<LandmarkCellScript>().See();
-        }
+            if (IsLandmarkCell)
+            {
+                GetComponentInParent<LandmarkCellScript>().See();
+            }
 
-        IsSeen = true;
-        ceiling.SetActive(false);
+            IsSeen = true;
+            StartCoroutine(CeilingReveal(0.5f));
+        }
     }
 
     public void Visit()
@@ -120,5 +125,21 @@ public class MazeCellScript : MonoBehaviour
             WallType.Bottom => !b_wall.activeSelf,
             _ => false,
         };
+    }
+
+    private IEnumerator CeilingReveal(float duration)
+    {
+        Color color = ceiling.color;
+        float time = 0;
+
+        while (time < duration)
+        {
+            ceiling.color = new Color(color.r, color.g, color.b, Mathf.Lerp(1f, 0f, time / duration));
+
+            time += Time.deltaTime;
+
+            yield return null;
+        }
+        ceiling.enabled = false;
     }
 }

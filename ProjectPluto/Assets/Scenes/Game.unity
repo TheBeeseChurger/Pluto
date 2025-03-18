@@ -284,6 +284,7 @@ GameObject:
   - component: {fileID: 383658864}
   - component: {fileID: 383658863}
   - component: {fileID: 383658865}
+  - component: {fileID: 383658866}
   m_Layer: 0
   m_Name: Pluto
   m_TagString: Player
@@ -457,6 +458,21 @@ PolygonCollider2D:
       - {x: 0.50459933, y: 0.43074617}
       - {x: 0.4308887, y: 0.5}
   m_UseDelaunayMesh: 0
+--- !u!114 &383658866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383658859}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c3474ef201300949bc6e25391f3c82c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  move_speed: 10
+  gm: {fileID: 1280212732}
+  type: 0
 --- !u!1 &488915853
 GameObject:
   m_ObjectHideFlags: 0
@@ -604,7 +620,7 @@ GameObject:
   - component: {fileID: 859911414}
   m_Layer: 0
   m_Name: Ceres
-  m_TagString: Untagged
+  m_TagString: Evil
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
