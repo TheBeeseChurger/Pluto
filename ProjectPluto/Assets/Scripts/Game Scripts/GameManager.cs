@@ -135,7 +135,46 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("Game");
     }
 
+    public IEnumerable<Vector2> PossibleDirections(Vector3 curr_pos)
+    {
+        return PossibleDirections(new Vector2(curr_pos.x, curr_pos.y));
+    }
+
+    public IEnumerable<Vector2> PossibleDirections(Vector2 curr_pos)
+    {
+        var my_pos = CalcMazePos(curr_pos);
+
+        var connections = maze_gen.GetConnectedCells(maze_gen.GetCell((int)my_pos.x, (int)my_pos.y));
+
+        foreach (var connection in connections)
+        {
+            var cell_pos = connection.transform.localPosition;
+
+            if (cell_pos.x < my_pos.x)
+            {
+                yield return Vector2.left;
+            }
+            else if (cell_pos.x > my_pos.x)
+            {
+                yield return Vector2.right;
+            }
+            else if (cell_pos.y < my_pos.y)
+            {
+                yield return Vector2.down;
+            }
+            else if (cell_pos.y > my_pos.y)
+            {
+                yield return Vector2.up;
+            }
+        }
+    }
+
     private Vector2 CalcMazePos(Vector3 pos)
+    {
+        return CalcMazePos(pos.x, pos.y);
+    }
+
+    private Vector2 CalcMazePos(Vector2 pos)
     {
         return CalcMazePos(pos.x, pos.y);
     }

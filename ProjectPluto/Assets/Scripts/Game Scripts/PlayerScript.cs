@@ -1,4 +1,3 @@
-using System.Security;
 using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
