@@ -33,13 +33,13 @@ public class GeneratorScript : MonoBehaviour
     public void Generate()
     {
         MazeGenerationStage1();
-        Debug.Log("Generation Stage 1: Done!");
+        //Debug.Log("Generation Stage 1: Done!");
 
         MazeGenerationStage2();
-        Debug.Log("Generation Stage 2: Done!");
+        //Debug.Log("Generation Stage 2: Done!");
 
         MazeGenerationStage3();
-        Debug.Log("Generation Stage 3: Done!");
+        //Debug.Log("Generation Stage 3: Done!");
     }
 
     public MazeCellScript GetPlayer1Spawn()
@@ -81,7 +81,7 @@ public class GeneratorScript : MonoBehaviour
 
         landmark_count = (int)((tile_count / 4f) * (landmark_percent / 100f));
 
-        Debug.Log("Spawning " +  landmark_count + " landmarks in maze.");
+        //Debug.Log("Spawning " +  landmark_count + " landmarks in maze.");
 
         for (int i = 0; i < landmark_count; i++)
         {
@@ -134,7 +134,7 @@ public class GeneratorScript : MonoBehaviour
 
         alt_clrs = (int)(tile_count * (clr_percent / 100f));
 
-        Debug.Log("Breaking up to " +  alt_clrs + " walls in maze.");
+        //Debug.Log("Breaking up to " +  alt_clrs + " walls in maze.");
 
         for (int i = 0; i < alt_clrs; i++)
         {
@@ -168,7 +168,7 @@ public class GeneratorScript : MonoBehaviour
 
         tile_count = cell_length * cell_width;
 
-        Debug.Log("Generating " + tile_count + " cells in maze.");
+        //Debug.Log("Generating " + tile_count + " cells in maze.");
 
         transform.position = new Vector3((cell_width / -2f) + 0.5f, (cell_length / -2f) + 0.5f, 0);
 
@@ -420,21 +420,25 @@ public class GeneratorScript : MonoBehaviour
 
         if (curr_cell.IsWallClr(MazeCellScript.WallType.Right) && x + 1 < cell_width)
         {
+            //Debug.Log("No wall to right");
             yield return maze_grid[x + 1, y];
         }
 
         if (curr_cell.IsWallClr(MazeCellScript.WallType.Left) && x - 1 >= 0)
         {
+            //Debug.Log("No wall to left");
             yield return maze_grid[x - 1, y];
         }
 
         if (curr_cell.IsWallClr(MazeCellScript.WallType.Top) && y + 1 < cell_length)
         {
+            //Debug.Log("No wall to up");
             yield return maze_grid[x, y + 1];
         }
 
         if (curr_cell.IsWallClr(MazeCellScript.WallType.Bottom) && y - 1 >= 0)
         {
+            //Debug.Log("No wall to down");
             yield return maze_grid[x, y - 1];
         }
     }

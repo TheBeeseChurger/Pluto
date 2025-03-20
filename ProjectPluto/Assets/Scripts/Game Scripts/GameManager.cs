@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -134,39 +135,43 @@ public class GameManager : MonoBehaviour
 
         SceneManager.LoadScene("Game");
     }
-
-    public IEnumerable<Vector2> PossibleDirections(Vector3 curr_pos)
+    
+    public List<Vector2> PossibleDirections(Vector2 curr_pos)
     {
-        return PossibleDirections(new Vector2(curr_pos.x, curr_pos.y));
-    }
+        List<Vector2> result = new();
 
-    public IEnumerable<Vector2> PossibleDirections(Vector2 curr_pos)
-    {
         var my_pos = CalcMazePos(curr_pos);
+        var my_cell = maze_gen.GetCell((int)my_pos.x, (int)my_pos.y);
 
-        var connections = maze_gen.GetConnectedCells(maze_gen.GetCell((int)my_pos.x, (int)my_pos.y));
+        var connections = maze_gen.GetConnectedCells(my_cell);
 
         foreach (var connection in connections)
         {
-            var cell_pos = connection.transform.localPosition;
+            var cell_pos = connection.transform.position;
 
-            if (cell_pos.x < my_pos.x)
+            if (cell_pos.x < my_cell.transform.position.x - 0.01f)
             {
-                yield return Vector2.left;
+                //Debug.Log("Adding Left direction as possible");
+                result.Add(Vector2.left);
             }
-            else if (cell_pos.x > my_pos.x)
+            else if (cell_pos.x > my_cell.transform.position.x + 0.01f)
             {
-                yield return Vector2.right;
+                //Debug.Log("Adding Right direction as possible");
+                result.Add(Vector2.right);
             }
-            else if (cell_pos.y < my_pos.y)
+            else if (cell_pos.y < my_cell.transform.position.y - 0.01f)
             {
-                yield return Vector2.down;
+                //Debug.Log("Adding Down direction as possible");
+                result.Add(Vector2.down);
             }
-            else if (cell_pos.y > my_pos.y)
+            else if (cell_pos.y > my_cell.transform.position.y + 0.01f)
             {
-                yield return Vector2.up;
+                //Debug.Log("Adding Up direction as possible");
+                result.Add(Vector2.up);
             }
         }
+
+        return result;
     }
 
     private Vector2 CalcMazePos(Vector3 pos)

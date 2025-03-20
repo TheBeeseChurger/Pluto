@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 363395611}
   - component: {fileID: 363395614}
   - component: {fileID: 363395613}
+  - component: {fileID: 363395615}
   m_Layer: 0
   m_Name: Proserpina
   m_TagString: Player2
@@ -271,6 +272,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &363395615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363395610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c3474ef201300949bc6e25391f3c82c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  move_speed: 1.85
+  gm: {fileID: 1280212732}
+  type: 1
+  mode: 0
 --- !u!1 &383658859
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,7 +301,6 @@ GameObject:
   - component: {fileID: 383658864}
   - component: {fileID: 383658863}
   - component: {fileID: 383658865}
-  - component: {fileID: 383658866}
   m_Layer: 0
   m_Name: Pluto
   m_TagString: Player
@@ -396,7 +412,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 383658859}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c1588dccd4f4f2241aca207afba9c0f7, type: 3}
   m_Name: 
@@ -458,22 +474,6 @@ PolygonCollider2D:
       - {x: 0.50459933, y: 0.43074617}
       - {x: 0.4308887, y: 0.5}
   m_UseDelaunayMesh: 0
---- !u!114 &383658866
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 383658859}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c3474ef201300949bc6e25391f3c82c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  move_speed: 0.02
-  gm: {fileID: 1280212732}
-  type: 0
-  mode: 0
 --- !u!1 &488915853
 GameObject:
   m_ObjectHideFlags: 0
@@ -768,10 +768,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 859911409}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87588f916a30c384eb419658deb7ec6f, type: 3}
+  m_Script: {fileID: 11500000, guid: 1c3474ef201300949bc6e25391f3c82c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  move_speed: 1.85
   gm: {fileID: 1280212732}
+  type: 2
+  mode: 0
 --- !u!1 &893120341
 GameObject:
   m_ObjectHideFlags: 0
