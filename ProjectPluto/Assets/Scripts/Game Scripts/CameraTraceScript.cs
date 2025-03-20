@@ -10,7 +10,12 @@ public class CameraTraceScript : MonoBehaviour
 
     [SerializeField] float move_speed;
 
-    [SerializeField] Camera cam;
+    Camera cam;
+
+    private void Start()
+    {
+        cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+    }
 
     void FixedUpdate()
     {

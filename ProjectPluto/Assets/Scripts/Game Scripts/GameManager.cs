@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject evil;
 
     [SerializeField] TextMeshProUGUI score_text;
+    [SerializeField] TextMeshProUGUI multiplier_text;
     private static int score = 110;
     private static float score_multiplier = 1f;
 
@@ -74,7 +75,7 @@ public class GameManager : MonoBehaviour
             maze_gen.GetCell(x_pos, y_pos).GetComponentInParent<LandmarkCellScript>().See();
         }
 
-        IEnumerable<MazeCellScript> cells = maze_gen.GetConnectedCells(maze_gen.GetCell(x_pos, y_pos));
+        List<MazeCellScript> cells = maze_gen.GetStraightConnectedCells(maze_gen.GetCell(x_pos, y_pos));
 
         foreach (var cell in cells)
         {
@@ -93,6 +94,7 @@ public class GameManager : MonoBehaviour
         }
 
         score_text.text = "Score:" + score;
+        multiplier_text.text = "Multipler x" + score_multiplier;
 
         var curr_pos = CalcMazePos(player1.transform.position);
 
@@ -106,7 +108,7 @@ public class GameManager : MonoBehaviour
                 SeeAndScore(maze_gen.GetCell(x_pos, y_pos));
             }
 
-            IEnumerable<MazeCellScript> cells = maze_gen.GetConnectedCells(maze_gen.GetCell(x_pos, y_pos));
+            List<MazeCellScript> cells = maze_gen.GetStraightConnectedCells(maze_gen.GetCell(x_pos, y_pos));
 
             foreach (var cell in cells)
             {

@@ -62,6 +62,39 @@ public class GeneratorScript : MonoBehaviour
         return maze_grid[x, y];
     }
 
+    public MazeCellScript GetCell(MazeCellScript cell, MazeCellScript.WallType direction)
+    {
+        int x;
+        int y;
+
+        if (!cell.IsLandmarkCell)
+        {
+            x = (int)cell.transform.localPosition.x;
+            y = (int)cell.transform.localPosition.y;
+        }
+        else
+        {
+            x = (int)(cell.transform.parent.localPosition.x + cell.transform.localPosition.x);
+            y = (int)(cell.transform.parent.localPosition.y + cell.transform.localPosition.y);
+        }
+
+        switch (direction)
+        {
+            case MazeCellScript.WallType.Left:
+                return maze_grid[x - 1, y];
+            case MazeCellScript.WallType.Right:
+                return maze_grid[x + 1, y];
+            case MazeCellScript.WallType.Top:
+                return maze_grid[x, y + 1];
+            case MazeCellScript.WallType.Bottom:
+                return maze_grid[x, y - 1];
+            default:
+                break;
+        }
+
+        return null;
+    }
+
     public void OverrideCell(MazeCellScript cell, int x, int y)
     {
         if (x < 0 || y < 0)
@@ -155,10 +188,6 @@ public class GeneratorScript : MonoBehaviour
         player2_spawn = FindCellOutOfRange(plyx, plyy, 5);
 
         evil_spawn = FindCellOutOfRange((int)player2_spawn.transform.localPosition.x, (int)player2_spawn.transform.localPosition.y, 5);
-
-        player1_spawn.See();
-        player2_spawn.See();
-        evil_spawn.See();
     }
 
     private void MazeGenerationStage1()
@@ -441,5 +470,54 @@ public class GeneratorScript : MonoBehaviour
             //Debug.Log("No wall to down");
             yield return maze_grid[x, y - 1];
         }
+    }
+
+    public List<MazeCellScript> GetStraightConnectedCells(MazeCellScript curr_cell)
+    {
+        List<MazeCellScript> cells = new();
+
+        var connections = GetConnectedCells(curr_cell);
+
+        foreach (var cell in connections)
+        {
+            var dir = GetDir(curr_cell, cell);
+
+            GetCellLine(cell, dir, cells);
+        }
+
+        return cells;
+    }
+
+    private void GetCellLine(MazeCellScript curr_cell, MazeCellScript.WallType dir, List<MazeCellScript> list)
+    {
+        if (!curr_cell.IsWallClr(dir))
+        {
+            list.Add(curr_cell);
+            return;
+        }
+        
+        var cell = GetCell(curr_cell, dir);
+
+        GetCellLine(cell, dir, list);
+
+        list.Add(curr_cell);
+    }
+
+    private MazeCellScript.WallType GetDir(MazeCellScript prev_cell, MazeCellScript curr_cell)
+    {
+        if (prev_cell.transform.position.x < curr_cell.transform.position.x)
+        {
+            return MazeCellScript.WallType.Right;
+        }
+        if (prev_cell.transform.position.x > curr_cell.transform.position.x)
+        {
+            return MazeCellScript.WallType.Left;
+        }
+        if (prev_cell.transform.position.y < curr_cell.transform.position.y)
+        {
+            return MazeCellScript.WallType.Top;
+        }
+
+        return MazeCellScript.WallType.Bottom;
     }
 }

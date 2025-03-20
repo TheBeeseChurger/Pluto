@@ -204,6 +204,7 @@ public class AIScript : MonoBehaviour
                 if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Player2"))
                 {
                     run_dir = dir;
+                    //Debug.Log("Chasing");
                     return AIMode.chase;
                 }
 

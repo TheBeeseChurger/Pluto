@@ -55,7 +55,12 @@ public class MenuManagerScript : MonoBehaviour
             Invoke(nameof(EndGame), 1.0f);
         }
 
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetKeyUp(KeyCode.M))
+        {
+            ToggleSong();
+        }
+
+        if (Input.GetKeyUp(KeyCode.Return))
         {
             SceneManager.LoadScene("Intermediary");
         }

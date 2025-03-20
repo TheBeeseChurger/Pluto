@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
@@ -33,13 +34,4 @@ public class PlayerScript : MonoBehaviour
         rb.linearVelocity = new Vector2(horizontal * move_speed, vertical * move_speed);
 
     }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.collider.CompareTag("Player") || collision.collider.CompareTag("Player2"))
-        {
-            gm.NextRound();
-        }
-    }
-
 }
