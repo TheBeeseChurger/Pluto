@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -10,6 +11,18 @@ public class IntermediaryManager : MonoBehaviour
     [SerializeField] GameObject prefab;
     static DataScript data;
 
+    [Header("Audio")]
+    [SerializeField] GameObject a_prefab;
+    static GameObject audio_head;
+
+    AudioSource ui;
+
+    [Header("Hover")]
+    [SerializeField] AudioResource hover;
+
+    [Header("Select")]
+    [SerializeField] AudioResource select;
+
     string player_name = "";
 
     [Header("Input Box")]
@@ -19,6 +32,9 @@ public class IntermediaryManager : MonoBehaviour
 
     [Header("END Button")]
     [SerializeField] Button end_button;
+
+    [Header("Keys")]
+    {[SerializeField] Button[] buttons;
 
     void Awake()
     {
@@ -33,7 +49,23 @@ public class IntermediaryManager : MonoBehaviour
 
             data = dataobj.GetComponent<DataScript>();
         }
-        
+
+        if (audio_head == null)
+        {
+            audio_head = GameObject.FindGameObjectWithTag("audio");
+
+            if (audio_head == null)
+            {
+                audio_head = Instantiate(prefab);
+            }
+        }
+
+        ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
+
+        foreach (var button in buttons)
+        {
+            button.onClick.AddListener(UISelectSFX);
+        }
 
         timer = gameObject.AddComponent<Timer>();
 
@@ -88,6 +120,18 @@ public class IntermediaryManager : MonoBehaviour
         Name();
 
         SceneManager.LoadScene("Game");
+    }
+
+    private void UIHoverSFX()
+    {
+        ui.resource = hover;
+        ui.Play();
+    }
+
+    private void UISelectSFX()
+    {
+        ui.resource = select;
+        ui.Play();
     }
 
     private void Name()
