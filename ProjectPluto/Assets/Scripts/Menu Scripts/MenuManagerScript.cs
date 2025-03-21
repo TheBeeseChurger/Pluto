@@ -15,8 +15,9 @@ public class MenuManagerScript : MonoBehaviour
     AudioSource song;
     AudioSource ui;
 
-    [Header("Quit")]
+    [Header("AudioResources")]
     [SerializeField] AudioResource quit;
+    [SerializeField] AudioResource bgm;
 
     void Start()
     {
@@ -32,6 +33,11 @@ public class MenuManagerScript : MonoBehaviour
 
         song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
         ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
+
+        song.resource = bgm;
+        song.loop = true;
+        song.volume = 1.0f;
+        song.Play();
 
         idle_timer = gameObject.AddComponent<Timer>();
 

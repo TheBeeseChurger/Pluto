@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -12,6 +13,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject player1;
     [SerializeField] GameObject player2;
     [SerializeField] GameObject evil;
+
+    [SerializeField] GameObject p2compass_hand;
+    [SerializeField] GameObject evcompass_hand;
 
     [SerializeField] TextMeshProUGUI score_text;
     [SerializeField] TextMeshProUGUI multiplier_text;
@@ -27,6 +31,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject prefab;
     static DataScript data;
 
+    [Header("Audio")]
+    [SerializeField] GameObject a_prefab;
+    static GameObject audio_head;
+
+    AudioSource song;
+    AudioSource ui;
+
+    [Header("AudioResource")]
+    [SerializeField] AudioResource bgm;
+
     private void Awake()
     {
         if (data == null)
@@ -39,6 +53,27 @@ public class GameManager : MonoBehaviour
             }
 
             data = dataobj.GetComponent<DataScript>();
+        }
+
+        if (audio_head == null)
+        {
+            audio_head = GameObject.FindGameObjectWithTag("audio");
+
+            if (audio_head == null)
+            {
+                audio_head = Instantiate(a_prefab);
+            }
+        }
+
+        song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
+        ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
+
+        if (song.resource != bgm)
+        {
+            song.resource = bgm;
+            song.loop = true;
+            song.volume = 0.45f;
+            song.Play();
         }
 
         timer = gameObject.AddComponent<Timer>();
@@ -118,6 +153,12 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+
+        var angle = Vector2.SignedAngle(player1.transform.position, player2.transform.position);
+        var angle_2 = Vector2.SignedAngle(player1.transform.position, evil.transform.position);
+
+        p2compass_hand.transform.rotation = new Quaternion(0f, 0f, angle, 1f);
+        evcompass_hand.transform.rotation = new Quaternion(0f, 0f, angle_2, 1f);
     }
 
     public void EndGame()

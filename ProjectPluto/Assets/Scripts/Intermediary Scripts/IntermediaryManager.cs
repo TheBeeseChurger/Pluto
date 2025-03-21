@@ -33,9 +33,6 @@ public class IntermediaryManager : MonoBehaviour
     [Header("END Button")]
     [SerializeField] Button end_button;
 
-    [Header("Keys")]
-    {[SerializeField] Button[] buttons;
-
     void Awake()
     {
         if (data == null)
@@ -56,16 +53,11 @@ public class IntermediaryManager : MonoBehaviour
 
             if (audio_head == null)
             {
-                audio_head = Instantiate(prefab);
+                audio_head = Instantiate(a_prefab);
             }
         }
 
         ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
-
-        foreach (var button in buttons)
-        {
-            button.onClick.AddListener(UISelectSFX);
-        }
 
         timer = gameObject.AddComponent<Timer>();
 
@@ -122,13 +114,13 @@ public class IntermediaryManager : MonoBehaviour
         SceneManager.LoadScene("Game");
     }
 
-    private void UIHoverSFX()
+    public void UISelectSFX()
     {
         ui.resource = hover;
         ui.Play();
     }
 
-    private void UISelectSFX()
+    public void UIPressSFX()
     {
         ui.resource = select;
         ui.Play();
