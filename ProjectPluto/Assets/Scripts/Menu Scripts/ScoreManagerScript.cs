@@ -1,5 +1,3 @@
-using Unity.VisualScripting;
-using UnityEditor.Animations;
 using UnityEngine;
 
 public class ScoreManagerScript : MonoBehaviour
@@ -17,7 +15,9 @@ public class ScoreManagerScript : MonoBehaviour
     [SerializeField] GameObject prefab;
     static DataScript data;
 
-    void Awake()
+    private bool IsInitializing = true;
+
+    public void DataInit()
     {
         if (data == null)
         {
@@ -25,14 +25,14 @@ public class ScoreManagerScript : MonoBehaviour
 
             if (dataobj == null)
             {
-                dataobj = GameObject.Instantiate(prefab);
+                dataobj = Instantiate(prefab);
             }
 
             data = dataobj.GetComponent<DataScript>();
         }
     }
 
-    void Start()
+    public void Init()
     {
         dir = new Vector3(0f, scroll_spd, 0f);
 
@@ -51,15 +51,20 @@ public class ScoreManagerScript : MonoBehaviour
 
             child.score = data.data.GetScore(i - 1);
 
+            child.Init();
             child.FormatText();
 
             pos += -2;
             i++;
         }
+
+        IsInitializing = false;
     }
 
     void Update()
     {
+        if (IsInitializing) return;
+
         if (!scrolling)
         {
             if (!timer.End) return;

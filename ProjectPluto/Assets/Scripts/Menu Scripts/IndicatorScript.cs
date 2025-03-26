@@ -9,17 +9,23 @@ public class IndicatorScript : MonoBehaviour
 
     Vector3 pos;
 
-    void Start()
+    private bool IsInitializing = true;
+
+    public void Init()
     {
         timer = gameObject.AddComponent<Timer>();
 
         timer.timer_spd = move_speed;
 
         pos = transform.position;
+
+        IsInitializing = false;
     }
 
     void Update()
     {
+        if (IsInitializing) return;
+
         if (timer.Toggle)
         {
             Vector3 new_pos = pos + new Vector3(0f, move_dist, 0f);

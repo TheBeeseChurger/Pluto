@@ -1,10 +1,15 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class MenuManagerScript : MonoBehaviour
 {
     Timer idle_timer;
+    InputSystem_Actions _input_system;
+    InputAction _cancel;
+    InputAction _mute;
+    InputAction _play;
 
     [SerializeField] float time;
 
@@ -19,7 +24,39 @@ public class MenuManagerScript : MonoBehaviour
     [SerializeField] AudioResource quit;
     [SerializeField] AudioResource bgm;
 
-    void Start()
+    [Header("Initialization References")]
+    [SerializeField] GameObject _triangle;
+    [SerializeField] IndicatorScript _indicator_script;
+    [SerializeField] GameObject _hi_score_board;
+    [SerializeField] ScoreManagerScript _score_manager_script;
+    [SerializeField] GameObject _press_start;
+    [SerializeField] BlinkTextScript _blink_text_script;
+
+    private bool IsInitializing = true;
+
+    public async Awaitable MenuStart()
+    {
+        await Awaitable.BackgroundThreadAsync();
+        Init();
+
+        await InstantiateAsync(_triangle);
+        _indicator_script = FindAnyObjectByType<IndicatorScript>();
+
+        _indicator_script.Init();
+
+        await InstantiateAsync(_hi_score_board);
+        _score_manager_script = FindAnyObjectByType<ScoreManagerScript>();
+
+        _score_manager_script.DataInit();
+        _score_manager_script.Init();
+
+        await InstantiateAsync(_press_start);
+        _blink_text_script = FindAnyObjectByType<BlinkTextScript>();
+
+        _blink_text_script.Init();
+    }
+
+    private void Init()
     {
         if (audio_head == null)
         { 
@@ -47,34 +84,65 @@ public class MenuManagerScript : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        _input_system = new();
+        EnableActions();
+
+        IsInitializing = false;
     }
 
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            
-            ui.resource = quit;
-            ui.time = 5f;
-            ui.Play();
-
-            Invoke(nameof(EndGame), 1.0f);
-        }
-
-        if (Input.GetKeyUp(KeyCode.M))
-        {
-            ToggleSong();
-        }
-
-        if (Input.GetKeyUp(KeyCode.Return))
-        {
-            SceneManager.LoadScene("Intermediary");
-        }
+        if (IsInitializing) return;
 
         if (idle_timer.End)
         {
             SceneManager.LoadScene("GameIdle");
         }
+    }
+
+    private void EnableActions()
+    {
+        _cancel = _input_system.UI.Cancel;
+        _cancel.Enable();
+
+        _cancel.performed += Cancel;
+
+        _mute = _input_system.UI.Mute;
+        _mute.Enable();
+
+        _mute.performed += Mute;
+
+        _play = _input_system.UI.Submit;
+        _play.Enable();
+
+        _play.performed += Play;
+    }
+
+    private void OnDisable()
+    {
+        _cancel.Disable();
+        _mute.Disable();
+        _play.Disable();
+    }
+
+    private void Cancel(InputAction.CallbackContext _context)
+    {
+        ui.resource = quit;
+        ui.time = 5f;
+        ui.Play();
+
+        Invoke(nameof(EndGame), 1.0f);
+    }
+
+    private void Mute(InputAction.CallbackContext _context)
+    {
+        ToggleSong();
+    }
+
+    private void Play(InputAction.CallbackContext _context)
+    {
+        SceneManager.LoadScene("Intermediary");
     }
 
     public void ToggleSong()

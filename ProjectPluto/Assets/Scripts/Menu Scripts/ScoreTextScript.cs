@@ -2,20 +2,19 @@ using UnityEngine;
 using TMPro;
 public class ScoreTextScript : MonoBehaviour
 {
-    public Score score = new Score(0, "AAA");
+    public Score score = new(0, "AAA");
 
     TextMeshProUGUI text;
 
     public int rank;
 
-    void Awake()
+    public void Init()
     {
         text = GetComponentInChildren<TextMeshProUGUI>();
     }
 
     public void FormatText()
     {
-
         text.text = score.GetName() + score.GetScore();
     }
 }

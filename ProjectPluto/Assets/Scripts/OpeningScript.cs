@@ -26,12 +26,6 @@ public class OpeningScript : MonoBehaviour
 
             await Awaitable.WaitForSecondsAsync(time_between_credits);
         }
-
-        Debug.Log("Finished Credits");
-
-        #if UNITY_EDITOR
-            Debug.Log("Finished Credits Test");
-        #endif
     }
 
     private async Awaitable FadeIn(Credit credit, float time)
@@ -40,7 +34,7 @@ public class OpeningScript : MonoBehaviour
         
         while (curr_time < time)
         {
-            float alpha = Mathf.Lerp(credit.cover_reference.color.a, 0f, curr_time / time);
+            float alpha = Mathf.Lerp(1f, 0f, curr_time / time);
 
             credit.cover_reference.color = new Color(credit.cover_reference.color.r, credit.cover_reference.color.g, credit.cover_reference.color.b, alpha);
 
@@ -57,7 +51,7 @@ public class OpeningScript : MonoBehaviour
 
         while (curr_time < time)
         {
-            float alpha = Mathf.Lerp(credit.cover_reference.color.a, 1f, curr_time / time);
+            float alpha = Mathf.Lerp(0f, 1f, curr_time / time);
 
             credit.cover_reference.color = new Color(credit.cover_reference.color.r, credit.cover_reference.color.g, credit.cover_reference.color.b, alpha);
 
