@@ -9,7 +9,8 @@ public class OpeningScript : MonoBehaviour
     [SerializeField] private float start_up_time;
     [SerializeField] private float time_between_credits;
 
-    public async void RunCredits()
+    [ContextMenu("Test Credits")]
+    public async Awaitable RunCredits()
     {
         await Awaitable.WaitForSecondsAsync(start_up_time);
 
@@ -27,6 +28,10 @@ public class OpeningScript : MonoBehaviour
         }
 
         Debug.Log("Finished Credits");
+
+        #if UNITY_EDITOR
+            Debug.Log("Finished Credits Test");
+        #endif
     }
 
     private async Awaitable FadeIn(Credit credit, float time)
