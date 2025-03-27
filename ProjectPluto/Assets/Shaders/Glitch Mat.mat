@@ -55,6 +55,8 @@ Material:
     m_Floats:
     - _EnableExternalAlpha: 0
     - _ZWrite: 0
+    - _chrom_aberr: 0
+    - _chrom_aberr_offset_max: 0.01
     - _flicker_strength: 0.427
     - _noise_amount: 78.4
     - _noise_strength: 0.603
