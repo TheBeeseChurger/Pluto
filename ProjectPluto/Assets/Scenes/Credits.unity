@@ -2501,7 +2501,7 @@ MonoBehaviour:
     cover_reference: {fileID: 720515693}
     credit_time: 2
     fade_in_time: 1
-    fade_out_time: 1
+    fade_out_time: 0.93
   - head: {fileID: 258416363}
     cover_reference: {fileID: 874672925}
     credit_time: 2

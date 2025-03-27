@@ -70,13 +70,7 @@ public class MenuManagerScript : MonoBehaviour
 
     private async Awaitable Init()
     {
-        if (audio_head == null)
-        {
-            await InstantiateAsync(prefab);
-
-            audio_head = GameObject.FindWithTag("audio");
-        }
-
+        await Awaitable.MainThreadAsync();
         song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
         ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
 
