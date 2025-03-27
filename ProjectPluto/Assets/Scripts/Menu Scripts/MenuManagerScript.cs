@@ -17,6 +17,8 @@ public class MenuManagerScript : MonoBehaviour
     [SerializeField] GameObject prefab;
     static GameObject audio_head;
 
+    static DataScript data;
+
     AudioSource song;
     AudioSource ui;
 
@@ -25,47 +27,54 @@ public class MenuManagerScript : MonoBehaviour
     [SerializeField] AudioResource bgm;
 
     [Header("Initialization References")]
-    [SerializeField] GameObject _triangle;
+    [SerializeField] GameObject _canvas;
     [SerializeField] IndicatorScript _indicator_script;
-    [SerializeField] GameObject _hi_score_board;
     [SerializeField] ScoreManagerScript _score_manager_script;
-    [SerializeField] GameObject _press_start;
     [SerializeField] BlinkTextScript _blink_text_script;
 
     private bool IsInitializing = true;
 
-    public async Awaitable MenuStart()
+    public (DataScript my_data, GameObject my_audio) GetStatics()
     {
-        await Awaitable.BackgroundThreadAsync();
-        Init();
+        return (data, audio_head);
+    }
 
-        await InstantiateAsync(_triangle);
+    public async Awaitable MenuStart(DataScript new_data = null, GameObject new_audio = null)
+    {
+        if (new_audio != null)
+        {
+            audio_head = new_audio;
+        }
+
+        if (new_data != null)
+        {
+            data = new_data;
+        }
+
+        await Init();
+
+        await InstantiateAsync(_canvas);
         _indicator_script = FindAnyObjectByType<IndicatorScript>();
 
         _indicator_script.Init();
 
-        await InstantiateAsync(_hi_score_board);
         _score_manager_script = FindAnyObjectByType<ScoreManagerScript>();
 
-        _score_manager_script.DataInit();
+        data = _score_manager_script.DataInit(data);
         _score_manager_script.Init();
-
-        await InstantiateAsync(_press_start);
+        
         _blink_text_script = FindAnyObjectByType<BlinkTextScript>();
 
         _blink_text_script.Init();
     }
 
-    private void Init()
+    private async Awaitable Init()
     {
         if (audio_head == null)
-        { 
-            audio_head = GameObject.FindGameObjectWithTag("audio");
+        {
+            await InstantiateAsync(prefab);
 
-            if (audio_head == null)
-            {
-                audio_head = Instantiate(prefab);
-            }
+            audio_head = GameObject.FindWithTag("audio");
         }
 
         song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();

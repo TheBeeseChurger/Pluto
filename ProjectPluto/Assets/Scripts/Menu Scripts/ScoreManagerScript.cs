@@ -17,19 +17,20 @@ public class ScoreManagerScript : MonoBehaviour
 
     private bool IsInitializing = true;
 
-    public void DataInit()
+    public DataScript DataInit(DataScript new_data = null)
     {
-        if (data == null)
+        if (new_data == null)
         {
-            GameObject dataobj = GameObject.FindWithTag("data");
-
-            if (dataobj == null)
-            {
-                dataobj = Instantiate(prefab);
-            }
+            GameObject dataobj = Instantiate(prefab);
 
             data = dataobj.GetComponent<DataScript>();
         }
+        else
+        {
+            data = new_data;
+        }
+
+        return data;
     }
 
     public void Init()

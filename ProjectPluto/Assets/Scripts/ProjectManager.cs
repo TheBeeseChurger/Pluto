@@ -13,13 +13,23 @@ public class ProjectManager : MonoBehaviour
     private OpeningScript _opening_script = null;
     private MenuManagerScript _menu_manager_script = null;
 
+    static GameObject audio_head;
+    static DataScript data;
+
+    [SerializeField] private bool Skip_Credits;
+
     private async void Start()
     {
-        await SceneManager.LoadSceneAsync(SCENE_CREDITS, LoadSceneMode.Additive);
-        CreditsSceneInit();
-        await _opening_script.RunCredits();
-        await CreditsSceneClose();
-        //await SceneManager.LoadSceneAsync(SCENE_MENU, LoadSceneMode.Additive);
+        if (!Skip_Credits)
+        {
+            await SceneManager.LoadSceneAsync(SCENE_CREDITS, LoadSceneMode.Additive);
+            CreditsSceneInit();
+            await _opening_script.RunCredits();
+            await CreditsSceneClose();
+        }
+
+        await SceneManager.LoadSceneAsync(SCENE_MENU, LoadSceneMode.Additive);
+        await MenuSceneInit();
 
     }
 
@@ -39,6 +49,15 @@ public class ProjectManager : MonoBehaviour
     {
         _menu_manager_script = FindFirstObjectByType<MenuManagerScript>();
 
-        await _menu_manager_script.MenuStart();
+        await _menu_manager_script.MenuStart(data, audio_head);
+
+        if (data == null && audio_head == null)
+        {
+            var (my_data, my_audio) = _menu_manager_script.GetStatics();
+
+            data = my_data;
+            audio_head = my_audio;
+        }
+        
     }
 }
