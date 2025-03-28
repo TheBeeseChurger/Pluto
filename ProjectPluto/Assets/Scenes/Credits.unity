@@ -2514,6 +2514,7 @@ MonoBehaviour:
     fade_out_time: 1
   start_up_time: 1
   time_between_credits: 1
+  pre_start: {fileID: 8300000, guid: 8552387fcc24e8947afb0eaadd34ed3a, type: 3}
 --- !u!4 &2134933240
 Transform:
   m_ObjectHideFlags: 0

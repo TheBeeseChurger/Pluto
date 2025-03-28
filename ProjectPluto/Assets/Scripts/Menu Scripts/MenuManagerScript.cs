@@ -13,8 +13,6 @@ public class MenuManagerScript : MonoBehaviour
 
     [SerializeField] float time;
 
-    [Header("Audio")]
-    [SerializeField] GameObject prefab;
     static GameObject audio_head;
 
     static DataScript data;
@@ -39,7 +37,7 @@ public class MenuManagerScript : MonoBehaviour
         return (data, audio_head);
     }
 
-    public async Awaitable MenuStart(DataScript new_data = null, GameObject new_audio = null)
+    public async Awaitable MenuStart(DataScript new_data, GameObject new_audio)
     {
         if (new_audio != null)
         {

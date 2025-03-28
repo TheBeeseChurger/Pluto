@@ -29,7 +29,7 @@ public class ProjectManager : MonoBehaviour
         {
             await SceneManager.LoadSceneAsync(SCENE_CREDITS, LoadSceneMode.Additive);
             CreditsSceneInit();
-            await _opening_script.RunCredits();
+            await _opening_script.RunCredits(audio_head);
             await CreditsSceneClose();
         }
 

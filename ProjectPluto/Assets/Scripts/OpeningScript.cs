@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class OpeningScript : MonoBehaviour
 {
@@ -9,9 +10,22 @@ public class OpeningScript : MonoBehaviour
     [SerializeField] private float start_up_time;
     [SerializeField] private float time_between_credits;
 
+    private static GameObject audio_head;
+    private AudioSource ambience;
+
+    [Header("Audio")]
+    [SerializeField] AudioResource pre_start;
+
     [ContextMenu("Test Credits")]
-    public async Awaitable RunCredits()
+    public async Awaitable RunCredits(GameObject new_audio)
     {
+        audio_head = new_audio;
+        ambience = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
+
+        ambience.resource = pre_start;
+        ambience.volume = 0.5f;
+        ambience.Play();
+
         await Awaitable.WaitForSecondsAsync(start_up_time);
 
         foreach (var credit in credits)
