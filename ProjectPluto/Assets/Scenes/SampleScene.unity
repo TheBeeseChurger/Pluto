@@ -159,7 +159,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f85af07c22e5f1848939c85e0446adcc, type: 2}
+  - {fileID: 2100000, guid: fb82877ea3ebcce4ba8c13cc4bb3baa9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -680,8 +680,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mat: {fileID: 2100000, guid: 0181d38406126e9448857ce6843b33b2, type: 2}
-  OnBool: 0
-  MaxOffset: 0.0293
+  OnBool: 1
+  MaxOffset: 0.0303
   Threshold: 0.039
 --- !u!4 &1594055826
 Transform:
@@ -738,7 +738,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f85af07c22e5f1848939c85e0446adcc, type: 2}
+  - {fileID: 2100000, guid: e56f75088af06194e87714bdacdecfe1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -760,7 +760,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0.34117648, b: 0.2, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
