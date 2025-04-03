@@ -67,14 +67,15 @@ Material:
     - _UIMaskSoftnessX: 1
     - _UIMaskSoftnessY: 1
     - _ZWrite: 0
-    - _chrom_aberr: 1
-    - _chrom_aberr_offset_max: 0.0303
+    - _chrom_aberr: 0
+    - _chrom_aberr_offset_max: 0.0187
+    - _chrom_aberr_speed: 6.97
     - _chrom_aberr_threshold: 0.039
     - _flicker_strength: 0.427
     - _noise_amount: 78.4
     - _noise_strength: 0.603
     - _overall_strength: 1
-    - _shader_control: 0
+    - _shader_control: 1
     - _transition_amount: 0.216
     - _transition_spd: 1
     m_Colors:

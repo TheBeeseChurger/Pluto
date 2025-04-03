@@ -154,11 +154,14 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        var angle = Vector2.SignedAngle(player1.transform.position, player2.transform.position);
-        var angle_2 = Vector2.SignedAngle(player1.transform.position, evil.transform.position);
+        var quat = new Quaternion(0, 0, 0, 0);
+        var quat_2 = new Quaternion(0, 0, 0, 0);
 
-        p2compass_hand.transform.rotation = new Quaternion(0f, 0f, angle, 1f);
-        evcompass_hand.transform.rotation = new Quaternion(0f, 0f, angle_2, 1f);
+        quat.SetFromToRotation(player1.transform.position, player2.transform.position - player1.transform.position);
+        quat_2.SetFromToRotation(player1.transform.position, evil.transform.position - player1.transform.position);
+
+        quat = Quaternion.SlerpUnclamped(p2compass_hand.transform.rotation, quat, 0.1f);
+        quat_2 = Quaternion.SlerpUnclamped(evcompass_hand.transform.rotation, quat_2, 0.1f);
     }
 
     public void EndGame()

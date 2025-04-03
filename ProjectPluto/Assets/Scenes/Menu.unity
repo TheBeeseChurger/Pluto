@@ -206,7 +206,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   time: 999
-  prefab: {fileID: 8828199008223564249, guid: 904f1881c1f4009499ac78857adffa00, type: 3}
   quit: {fileID: 8300000, guid: 4524d27f6658a034d95e5dd8056d1263, type: 3}
   bgm: {fileID: 8300000, guid: 62e98a73ab71c0744b30661320489a40, type: 3}
   _canvas: {fileID: 8374849266971287575, guid: 7c177c2436bdfe447af9b8d53e3aeadd, type: 3}
