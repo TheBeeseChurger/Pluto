@@ -157,11 +157,15 @@ public class GameManager : MonoBehaviour
         var quat = new Quaternion(0, 0, 0, 0);
         var quat_2 = new Quaternion(0, 0, 0, 0);
 
-        quat.SetFromToRotation(player1.transform.position, player2.transform.position - player1.transform.position);
-        quat_2.SetFromToRotation(player1.transform.position, evil.transform.position - player1.transform.position);
+        var vec1 = new Vector2(player1.transform.position.x, player1.transform.position.y);
+        var vec2 = new Vector2(player2.transform.position.x, player2.transform.position.y);
+        var vec3 = new Vector2(evil.transform.position.x, evil.transform.position.y);
 
-        quat = Quaternion.SlerpUnclamped(p2compass_hand.transform.rotation, quat, 0.1f);
-        quat_2 = Quaternion.SlerpUnclamped(evcompass_hand.transform.rotation, quat_2, 0.1f);
+        quat.SetFromToRotation(player1.transform.position, player2.transform.position);
+        quat_2.SetFromToRotation(player1.transform.position, evil.transform.position);
+
+        p2compass_hand.transform.rotation = quat;
+        evcompass_hand.transform.rotation = quat_2;
     }
 
     public void EndGame()
