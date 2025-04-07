@@ -22,10 +22,15 @@ public class GameManager : MonoBehaviour
     private static int score = 110;
     private static float score_multiplier = 1f;
 
-    private Timer timer;
+    private Timer score_timer;
+    private Timer distance_timer;
+
+    private int last_distance;
 
     private int x_pos;
     private int y_pos;
+
+    private bool compass_jammer = false;
 
     [Header("Data")]
     [SerializeField] GameObject prefab;
@@ -76,10 +81,15 @@ public class GameManager : MonoBehaviour
             song.Play();
         }
 
-        timer = gameObject.AddComponent<Timer>();
+        score_timer = gameObject.AddComponent<Timer>();
 
-        timer.timer_spd = 1f;
-        timer.timer_time = 1f;
+        score_timer.timer_spd = 1f;
+        score_timer.timer_time = 1f;
+
+        distance_timer = gameObject.AddComponent<Timer>();
+
+        distance_timer.timer_spd = 1f;
+        distance_timer .timer_time = 5f;
     }
 
     void Start()
@@ -119,13 +129,53 @@ public class GameManager : MonoBehaviour
                 SeeAndScore(cell);
             }
         }
+
+        last_distance = maze_gen.GetCellDistance(p1_cell, p2_cell);
+        //Debug.Log("Player spawned " + last_distance + " tiles away from Player 2.");
+        distance_timer.Interrupt();
     }
 
     void Update()
     {
-        if (timer.End && score >= 10)
+        if (score_timer.End && score >= 10)
         {
             score -= 10;
+        }
+
+        if (distance_timer.End)
+        {
+            last_distance = maze_gen.GetCellDistance(CalcMazePos(player1.transform.position), CalcMazePos(player2.transform.position));
+
+            //Debug.Log("Updated distance to " + last_distance);
+
+            if (last_distance < 3)
+            {
+                NextRound();
+            }
+            else if (last_distance < 10)
+            {
+                distance_timer.timer_time = 0f;
+                distance_timer.Interrupt();
+                //Debug.Log("Distance was less than 10, updating every frame now.");
+            }
+            else if (last_distance < 25)
+            {
+                distance_timer.timer_time = 1f;
+                //Debug.Log("Distance was less than 25, updating distance faster.");
+                distance_timer.Interrupt();
+            }
+            else if (last_distance < 40)
+            {
+                distance_timer.timer_time = 2.5f;
+                distance_timer.Interrupt();
+                //Debug.Log("Distance was less than 40, updating distance a bit faster.");
+            }
+            else
+            {
+                distance_timer.timer_time = 5f;
+                distance_timer.Interrupt();
+                //Debug.Log("Distance greater than 40, updating distance slowly.");
+            }
         }
 
         score_text.text = "Score:" + score;
@@ -154,18 +204,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        var quat = new Quaternion(0, 0, 0, 0);
-        var quat_2 = new Quaternion(0, 0, 0, 0);
-
-        var vec1 = new Vector2(player1.transform.position.x, player1.transform.position.y);
-        var vec2 = new Vector2(player2.transform.position.x, player2.transform.position.y);
-        var vec3 = new Vector2(evil.transform.position.x, evil.transform.position.y);
-
-        quat.SetFromToRotation(player1.transform.position, player2.transform.position);
-        quat_2.SetFromToRotation(player1.transform.position, evil.transform.position);
-
-        p2compass_hand.transform.rotation = quat;
-        evcompass_hand.transform.rotation = quat_2;
+        CompassControl();
     }
 
     public void EndGame()
@@ -257,5 +296,42 @@ public class GameManager : MonoBehaviour
         {
             score += (int)(10 * score_multiplier);
         }
+    }
+
+    private void CompassControl()
+    {
+        var dist1 = player2.transform.position - player1.transform.position;
+        var dist2 = evil.transform.position - player1.transform.position;
+
+        if (compass_jammer || (dist1.magnitude < 5f || dist2.magnitude < 5f))
+        {
+            var ang1 = Random.Range(-180, 180);
+            var ang2 = Random.Range(-180, 180);
+
+            Quaternion quat1 = Quaternion.Euler(0f, 0f, ang1);
+            Quaternion quat2 = Quaternion.Euler(0f, 0f, ang2);
+
+            p2compass_hand.transform.rotation = Quaternion.RotateTowards(p2compass_hand.transform.rotation, quat1,
+                Mathf.Abs(p2compass_hand.transform.rotation.eulerAngles.z - ang1) * Random.Range(0.5f, 4.5f) * Time.deltaTime);
+            evcompass_hand.transform.rotation = Quaternion.RotateTowards(evcompass_hand.transform.rotation, quat2,
+                Mathf.Abs(p2compass_hand.transform.rotation.eulerAngles.z - ang2) * Random.Range(0.5f, 4.5f) * Time.deltaTime);
+
+            return;
+        }
+
+        var dir1 = (dist1).normalized;
+        var dir2 = (dist2).normalized;
+
+        float angle1 = Vector2.SignedAngle(Vector2.up, dir1);
+        float angle2 = Vector2.SignedAngle(Vector2.up, dir2);
+
+        Quaternion q_ang1 = Quaternion.Euler(0f, 0f, angle1);
+        Quaternion q_ang2 = Quaternion.Euler(0f, 0f, angle2);
+
+        var diff_spd1 = Mathf.Abs(p2compass_hand.transform.rotation.eulerAngles.z - angle1);
+        var diff_spd2 = Mathf.Abs(evcompass_hand.transform.rotation.eulerAngles.z - angle2);
+
+        p2compass_hand.transform.rotation = Quaternion.RotateTowards(p2compass_hand.transform.rotation, q_ang1, diff_spd1 * Time.deltaTime);
+        evcompass_hand.transform.rotation = Quaternion.RotateTowards(evcompass_hand.transform.rotation, q_ang2, diff_spd2 * Time.deltaTime);
     }
 }

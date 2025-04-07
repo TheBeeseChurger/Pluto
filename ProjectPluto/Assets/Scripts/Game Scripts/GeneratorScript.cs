@@ -62,7 +62,7 @@ public class GeneratorScript : MonoBehaviour
         return maze_grid[x, y];
     }
 
-    public MazeCellScript GetCell(MazeCellScript cell, MazeCellScript.WallType direction)
+    public Vector2 CellMazePos(MazeCellScript cell)
     {
         int x;
         int y;
@@ -77,6 +77,16 @@ public class GeneratorScript : MonoBehaviour
             x = (int)(cell.transform.parent.localPosition.x + cell.transform.localPosition.x);
             y = (int)(cell.transform.parent.localPosition.y + cell.transform.localPosition.y);
         }
+
+        return new Vector2(x, y);
+    }
+
+    public MazeCellScript GetCell(MazeCellScript cell, MazeCellScript.WallType direction)
+    {
+        var position = CellMazePos(cell);
+
+        int x = (int)position.x;
+        int y = (int)position.y;
 
         switch (direction)
         {
@@ -93,6 +103,53 @@ public class GeneratorScript : MonoBehaviour
         }
 
         return null;
+    }
+
+    public int GetCellDistance(MazeCellScript start, MazeCellScript end)
+    {
+        return GetCellDistance(CellMazePos(start), CellMazePos(end));
+    }
+
+    public int GetCellDistance(Vector2 start, Vector2 goal)
+    {
+        //BFS Algorithm
+        bool[,] seen = new bool[maze_grid.GetLength(0), maze_grid.GetLength(1)];
+
+        Queue<KeyValuePair<MazeCellScript, int>> queue = new();
+
+        //Start at start
+        queue.Enqueue(new KeyValuePair<MazeCellScript, int>(GetCell((int)start.x, (int)start.y), 0));
+        seen[(int)start.x, (int)start.y] = true;
+
+        // Math stuf
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            MazeCellScript currentCell = current.Key;
+            int currentDistance = current.Value;
+
+            if (currentCell == GetCell((int)goal.x, (int)goal.y))
+            {
+                return currentDistance;
+            }
+
+            var newCells = GetConnectedCells(currentCell);
+
+            foreach (var cell in newCells)
+            {
+                var position = CellMazePos(cell);
+                int x = (int)position.x;
+                int y = (int)position.y;
+
+                if (!seen[x, y])
+                {
+                    seen[x, y] = true;
+                    queue.Enqueue(new KeyValuePair<MazeCellScript, int>(cell, currentDistance + 1));
+                }
+            }
+        }
+
+        return -1;
     }
 
     public void OverrideCell(MazeCellScript cell, int x, int y)
