@@ -12,6 +12,7 @@ public class ProjectManager : MonoBehaviour
 
     private OpeningScript _opening_script = null;
     private MenuManagerScript _menu_manager_script = null;
+    private LoadingManager _loading_manager = null;
 
     [SerializeField] private DataScript d_prefab;
     [SerializeField] private GameObject a_prefab;
@@ -33,6 +34,10 @@ public class ProjectManager : MonoBehaviour
             await CreditsSceneClose();
         }
 
+        SceneManager.LoadScene(SCENE_LOADING, LoadSceneMode.Additive);
+        await LoadingSceneInit();
+
+        await Awaitable.BackgroundThreadAsync();
         await SceneManager.LoadSceneAsync(SCENE_MENU, LoadSceneMode.Additive);
         await MenuSceneInit();
 
@@ -55,6 +60,13 @@ public class ProjectManager : MonoBehaviour
         _menu_manager_script = FindFirstObjectByType<MenuManagerScript>();
 
         await _menu_manager_script.MenuStart(data, audio_head);
+    }
+
+    private async Awaitable LoadingSceneInit()
+    {
+        _loading_manager = FindFirstObjectByType<LoadingManager>();
+
+        
     }
 
     private async Awaitable InitStatics()

@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b863c375115efb46a6ee451eeb350af, type: 3}
+  m_Name: LoadingTip15
+  m_EditorClassIdentifier: 
+  text: <color=#FF5733>They</color> didn't have enough <color=#4395D4>influence</color>
+    to enter the <color=#19D14C>mortal realm</color>.
+  sprite: {fileID: 0}
