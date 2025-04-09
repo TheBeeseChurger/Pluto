@@ -32,11 +32,6 @@ public class MenuManagerScript : MonoBehaviour
 
     private bool IsInitializing = true;
 
-    public (DataScript my_data, GameObject my_audio) GetStatics()
-    {
-        return (data, audio_head);
-    }
-
     public async Awaitable MenuStart(DataScript new_data, GameObject new_audio)
     {
         if (new_audio != null)
@@ -74,7 +69,6 @@ public class MenuManagerScript : MonoBehaviour
 
         song.resource = bgm;
         song.loop = true;
-        song.volume = 1.0f;
         song.Play();
 
         idle_timer = gameObject.AddComponent<Timer>();
@@ -122,9 +116,9 @@ public class MenuManagerScript : MonoBehaviour
 
     private void OnDisable()
     {
-        _cancel.Disable();
-        _mute.Disable();
-        _play.Disable();
+        _cancel?.Disable();
+        _mute?.Disable();
+        _play?.Disable();
     }
 
     private void Cancel(InputAction.CallbackContext _context)

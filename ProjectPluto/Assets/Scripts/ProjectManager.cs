@@ -31,15 +31,22 @@ public class ProjectManager : MonoBehaviour
             await SceneManager.LoadSceneAsync(SCENE_CREDITS, LoadSceneMode.Additive);
             CreditsSceneInit();
             await _opening_script.RunCredits(audio_head);
+
+            await SceneManager.LoadSceneAsync(SCENE_LOADING, LoadSceneMode.Additive);
+            await LoadingSceneInit();
+
             await CreditsSceneClose();
         }
+        else
+        {
+            await SceneManager.LoadSceneAsync(SCENE_LOADING, LoadSceneMode.Additive);
+            await LoadingSceneInit();
+        }
 
-        SceneManager.LoadScene(SCENE_LOADING, LoadSceneMode.Additive);
-        await LoadingSceneInit();
-
-        await Awaitable.BackgroundThreadAsync();
         await SceneManager.LoadSceneAsync(SCENE_MENU, LoadSceneMode.Additive);
         await MenuSceneInit();
+
+        await LoadingSceneClose();
 
     }
 
@@ -66,7 +73,12 @@ public class ProjectManager : MonoBehaviour
     {
         _loading_manager = FindFirstObjectByType<LoadingManager>();
 
-        
+        await _loading_manager.FadeSceneIn();
+    }
+
+    private async Awaitable LoadingSceneClose()
+    {
+        await _loading_manager.FadeSceneOut();
     }
 
     private async Awaitable InitStatics()
