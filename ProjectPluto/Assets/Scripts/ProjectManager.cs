@@ -43,10 +43,8 @@ public class ProjectManager : MonoBehaviour
             await LoadingSceneInit();
         }
 
-        await SceneManager.LoadSceneAsync(SCENE_MENU, LoadSceneMode.Additive);
-        await MenuSceneInit();
 
-        await LoadingSceneClose();
+        await LoadingSceneMenuOpen();
 
     }
 
@@ -62,23 +60,36 @@ public class ProjectManager : MonoBehaviour
         await SceneManager.UnloadSceneAsync(SCENE_CREDITS);
     }
 
-    private async Awaitable MenuSceneInit()
+    public async Awaitable MenuSceneStart()
     {
         _menu_manager_script = FindFirstObjectByType<MenuManagerScript>();
 
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(SCENE_MENU));
         await _menu_manager_script.MenuStart(data, audio_head);
+    }
+
+    private async Awaitable MenuSceneInit()
+    {
+        await SceneManager.LoadSceneAsync(SCENE_MENU, LoadSceneMode.Additive);
     }
 
     private async Awaitable LoadingSceneInit()
     {
         _loading_manager = FindFirstObjectByType<LoadingManager>();
 
-        await _loading_manager.FadeSceneIn();
+        await _loading_manager.FadeSceneIn(true);
     }
 
-    private async Awaitable LoadingSceneClose()
+    private async Awaitable LoadingSceneMenuOpen()
     {
-        await _loading_manager.FadeSceneOut();
+        await MenuSceneInit();
+        _loading_manager.UpdateProgress((1f / 3f) * 100f);
+        await MenuSceneStart();
+        await Awaitable.WaitForSecondsAsync(0.1f);
+        _loading_manager.UpdateProgress((2f / 3f) * 100f);
+        await Awaitable.WaitForSecondsAsync(0.5f);
+        _loading_manager.UpdateProgress((1f) * 100f);
+        await _loading_manager.FinishProgress(true);
     }
 
     private async Awaitable InitStatics()

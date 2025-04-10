@@ -4,7 +4,8 @@ using UnityEngine.Audio;
 
 public class LoadingManager : MonoBehaviour
 {
-    public LoadingTip current_tip;
+    public LoadingTip[] loading_tips;
+    private LoadingTip current_tip;
 
     [SerializeField] private TextMeshProUGUI random_text;
     [SerializeField] private SpriteRenderer random_sprite;
@@ -14,6 +15,10 @@ public class LoadingManager : MonoBehaviour
     [SerializeField] private SpriteRenderer scene_icon;
 
     [SerializeField] private AudioMixer audio_volume;
+
+    [Range(0f, 1f)]
+    private float progress = 0f;
+    [SerializeField] private RectTransform bar;
 
     [ContextMenu("Update Tip")]
     public void UpdateLoadingTip()
@@ -25,7 +30,7 @@ public class LoadingManager : MonoBehaviour
         random_sprite.sprite = current_tip.sprite;
     }
 
-    public async Awaitable FadeSceneOut()
+    public async Awaitable FadeSceneOut(bool audio_change = false)
     {
         float curr_time = 0f;
         while (scene_alpha.alpha > 0f)
@@ -35,15 +40,18 @@ public class LoadingManager : MonoBehaviour
             scene_alpha.alpha = alpha;
             scene_background.color = new Color(scene_background.color.r, scene_background.color.g, scene_background.color.b, alpha);
             scene_icon.color = new Color(scene_icon.color.r, scene_icon.color.g, scene_icon.color.b, alpha);
-            //audio_volume.SetFloat("Volume",0);
+            if (audio_change) audio_volume.SetFloat("Volume", ((1f - alpha) * 80f) - 80f);
 
             await Awaitable.NextFrameAsync();
             curr_time += Time.deltaTime;
         }
     }
 
-    public async Awaitable FadeSceneIn()
+    public async Awaitable FadeSceneIn(bool audio_change = false)
     {
+        PickNewLoadingTip();
+        UpdateLoadingTip();
+
         float curr_time = 0f;
         while (scene_alpha.alpha < 1f)
         {
@@ -52,9 +60,42 @@ public class LoadingManager : MonoBehaviour
             scene_alpha.alpha = alpha;
             scene_background.color = new Color(scene_background.color.r, scene_background.color.g, scene_background.color.b, alpha);
             scene_icon.color = new Color(scene_icon.color.r, scene_icon.color.g, scene_icon.color.b, alpha);
+            if (audio_change) audio_volume.SetFloat("Volume", ((1f - alpha) * 80f) - 80f);
 
             await Awaitable.NextFrameAsync();
             curr_time += Time.deltaTime;
         }
+    }
+
+    public async void UpdateProgress(float new_progress)
+    {
+        progress = new_progress;
+
+        var time = 0f;
+        while (Mathf.Abs(bar.localScale.x - progress) > 0.1f)
+        {
+            bar.localScale = new Vector3(Mathf.Lerp(bar.localScale.x, progress, 10.0f * Time.deltaTime), bar.localScale.y, bar.localScale.z);
+
+
+            await Awaitable.NextFrameAsync();
+            time += Time.deltaTime;
+        }
+
+        await Awaitable.NextFrameAsync();
+    }
+
+    public async Awaitable FinishProgress(bool audio_change = false)
+    {
+        while (bar.localScale.x < 99.9f)
+        {
+            await Awaitable.NextFrameAsync();
+        }
+
+        await FadeSceneOut(audio_change);
+    }
+
+    private void PickNewLoadingTip()
+    {
+        current_tip = loading_tips[Random.Range(0, loading_tips.Length)];
     }
 }
