@@ -14,7 +14,7 @@ public class MenuManagerScript : MonoBehaviour
     [SerializeField] float time;
 
     static GameObject audio_head;
-
+    static int game_start = 0;
     static DataScript data;
 
     AudioSource song;
@@ -30,10 +30,14 @@ public class MenuManagerScript : MonoBehaviour
     [SerializeField] ScoreManagerScript _score_manager_script;
     [SerializeField] BlinkTextScript _blink_text_script;
 
+    [Header("Intro Animation")]
+    [SerializeField] GameObject prefab;
+
     private bool IsInitializing = true;
 
-    public async Awaitable MenuStart(DataScript new_data, GameObject new_audio)
+    public async Awaitable MenuPreStart(DataScript new_data, GameObject new_audio)
     {
+        game_start++;
         if (new_audio != null)
         {
             audio_head = new_audio;
@@ -44,8 +48,9 @@ public class MenuManagerScript : MonoBehaviour
             data = new_data;
         }
 
-        await Init();
+        Init();
 
+        await InstantiateAsync(prefab);
         await InstantiateAsync(_canvas);
         _indicator_script = FindAnyObjectByType<IndicatorScript>();
 
@@ -61,15 +66,21 @@ public class MenuManagerScript : MonoBehaviour
         _blink_text_script.Init();
     }
 
-    private async Awaitable Init()
+    public void MenuStart()
     {
-        await Awaitable.MainThreadAsync();
-        song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
-        ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
+        _score_manager_script.Start();
 
         song.resource = bgm;
         song.loop = true;
         song.Play();
+        
+        FindAnyObjectByType<Animator>().Play("Open");
+    }
+
+    private void Init()
+    {
+        song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
+        ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
 
         idle_timer = gameObject.AddComponent<Timer>();
 
@@ -127,6 +138,7 @@ public class MenuManagerScript : MonoBehaviour
         ui.time = 5f;
         ui.Play();
 
+        FindFirstObjectByType<Animator>().Play("Close");
         Invoke(nameof(EndGame), 1.0f);
     }
 
@@ -137,7 +149,7 @@ public class MenuManagerScript : MonoBehaviour
 
     private void Play(InputAction.CallbackContext _context)
     {
-        SceneManager.LoadScene("Intermediary");
+        ProjectManager.MenuToIntermediary?.Invoke();
     }
 
     public void ToggleSong()

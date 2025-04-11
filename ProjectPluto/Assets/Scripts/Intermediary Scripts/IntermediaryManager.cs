@@ -7,12 +7,8 @@ using UnityEngine.UI;
 
 public class IntermediaryManager : MonoBehaviour
 {
-    [Header("Data")]
-    [SerializeField] GameObject prefab;
     static DataScript data;
 
-    [Header("Audio")]
-    [SerializeField] GameObject a_prefab;
     static GameObject audio_head;
 
     AudioSource ui;
@@ -25,45 +21,33 @@ public class IntermediaryManager : MonoBehaviour
 
     string player_name = "";
 
-    [Header("Input Box")]
-    [SerializeField] TextMeshProUGUI input_box;
+    TextMeshProUGUI input_box;
 
     Timer timer;
 
-    [Header("END Button")]
-    [SerializeField] Button end_button;
+    Button[] all_buttons;
+    Button end_button;
 
-    void Awake()
+    [Header("Initialization References")]
+    [SerializeField] GameObject _canvas;
+
+    public async Awaitable IntermediaryPreStart(DataScript new_data, GameObject new_audio)
     {
-        if (data == null)
+        if (new_audio != null)
         {
-            GameObject dataobj = GameObject.FindWithTag("data");
-
-            if (dataobj == null)
-            {
-                dataobj = GameObject.Instantiate(prefab);
-            }
-
-            data = dataobj.GetComponent<DataScript>();
+            audio_head = new_audio;
         }
 
-        if (audio_head == null)
+        if (new_data != null)
         {
-            audio_head = GameObject.FindGameObjectWithTag("audio");
-
-            if (audio_head == null)
-            {
-                audio_head = Instantiate(a_prefab);
-            }
+            data = new_data;
         }
 
         ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
 
-        timer = gameObject.AddComponent<Timer>();
+        TimerInit();
 
-        timer.timer_spd = 1;
-        timer.timer_time = 0.6f;
-        timer.Interrupt();
+        await InstantiateAsync(_canvas);
     }
 
     private void Update()
@@ -84,6 +68,15 @@ public class IntermediaryManager : MonoBehaviour
         {
             end_button.interactable = false;
         }
+    }
+
+    private void TimerInit()
+    {
+        timer = gameObject.AddComponent<Timer>();
+
+        timer.timer_spd = 1;
+        timer.timer_time = 0.6f;
+        timer.Interrupt();
     }
 
     public void KeyboardClick(string key)

@@ -16,6 +16,7 @@ public class ScoreManagerScript : MonoBehaviour
     static DataScript data;
 
     private bool IsInitializing = true;
+    private bool IsStart = false;
 
     public DataScript DataInit(DataScript new_data = null)
     {
@@ -62,9 +63,15 @@ public class ScoreManagerScript : MonoBehaviour
         IsInitializing = false;
     }
 
+    public void Start()
+    {
+        IsStart = true;
+    }
+
     void Update()
     {
         if (IsInitializing) return;
+        if (!IsStart) return;
 
         if (!scrolling)
         {

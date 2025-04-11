@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,6 +14,7 @@ public class ProjectManager : MonoBehaviour
     private OpeningScript _opening_script = null;
     private MenuManagerScript _menu_manager_script = null;
     private LoadingManager _loading_manager = null;
+    private IntermediaryManager _intermediary_manager = null;
 
     [SerializeField] private DataScript d_prefab;
     [SerializeField] private GameObject a_prefab;
@@ -22,34 +24,37 @@ public class ProjectManager : MonoBehaviour
 
     [SerializeField] private bool Skip_Credits;
 
+    public static Action MenuToIntermediary;
+    public static Action IntermediaryToGame;
+    public static Action GameToMenu;
+
     private async void Start()
     {
         await InitStatics();
+        InitActions();
 
         if (!Skip_Credits)
         {
-            await SceneManager.LoadSceneAsync(SCENE_CREDITS, LoadSceneMode.Additive);
-            CreditsSceneInit();
+            await CreditsSceneInit();
             await _opening_script.RunCredits(audio_head);
 
-            await SceneManager.LoadSceneAsync(SCENE_LOADING, LoadSceneMode.Additive);
             await LoadingSceneInit();
 
             await CreditsSceneClose();
         }
         else
         {
-            await SceneManager.LoadSceneAsync(SCENE_LOADING, LoadSceneMode.Additive);
             await LoadingSceneInit();
         }
 
-
-        await LoadingSceneMenuOpen();
-
+        await MenuSceneInit();
+        await MenuSceneStart();
     }
 
-    private void CreditsSceneInit()
+    private async Awaitable CreditsSceneInit()
     {
+        await SceneManager.LoadSceneAsync(SCENE_CREDITS, LoadSceneMode.Additive);
+
         _opening_script = FindFirstObjectByType<OpeningScript>();
     }
 
@@ -60,33 +65,57 @@ public class ProjectManager : MonoBehaviour
         await SceneManager.UnloadSceneAsync(SCENE_CREDITS);
     }
 
-    public async Awaitable MenuSceneStart()
+    private async Awaitable MenuSceneStart()
     {
-        _menu_manager_script = FindFirstObjectByType<MenuManagerScript>();
-
         SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(SCENE_MENU));
-        await _menu_manager_script.MenuStart(data, audio_head);
+        await _menu_manager_script.MenuPreStart(data, audio_head);
+        await Awaitable.NextFrameAsync();
+        _menu_manager_script.MenuStart();
     }
 
     private async Awaitable MenuSceneInit()
     {
         await SceneManager.LoadSceneAsync(SCENE_MENU, LoadSceneMode.Additive);
+
+        _menu_manager_script = FindFirstObjectByType<MenuManagerScript>();
+    }
+
+    private async Awaitable MenuSceneClose()
+    {
+        _menu_manager_script = null;
+
+        await SceneManager.UnloadSceneAsync(SCENE_MENU);
+    }
+
+    private async Awaitable IntermediarySceneInit()
+    {
+        await SceneManager.LoadSceneAsync(SCENE_INTERMEDIARY, LoadSceneMode.Additive);
+
+        _intermediary_manager = FindFirstObjectByType<IntermediaryManager>();
+    }
+
+    private async Awaitable IntermediarySceneStart()
+    {
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(SCENE_INTERMEDIARY));
+        await _intermediary_manager.IntermediaryPreStart(data, audio_head);
     }
 
     private async Awaitable LoadingSceneInit()
     {
-        _loading_manager = FindFirstObjectByType<LoadingManager>();
+        await SceneManager.LoadSceneAsync(SCENE_LOADING, LoadSceneMode.Additive);
 
-        await _loading_manager.FadeSceneIn(true);
+        _loading_manager = FindFirstObjectByType<LoadingManager>();
     }
 
-    private async Awaitable LoadingSceneMenuOpen()
+    private async void LoadingSceneMenuToIntermediary()
     {
-        await MenuSceneInit();
-        _loading_manager.UpdateProgress((1f / 3f) * 100f);
-        await MenuSceneStart();
+        await _loading_manager.FadeSceneIn(true);
+        await MenuSceneClose();
+        _loading_manager.UpdateProgress(0.5f * 100f);
+        await IntermediarySceneInit();
         await Awaitable.WaitForSecondsAsync(0.1f);
-        _loading_manager.UpdateProgress((2f / 3f) * 100f);
+        _loading_manager.UpdateProgress(0.75f * 100f);
+        await IntermediarySceneStart();
         await Awaitable.WaitForSecondsAsync(0.5f);
         _loading_manager.UpdateProgress((1f) * 100f);
         await _loading_manager.FinishProgress(true);
@@ -100,5 +129,12 @@ public class ProjectManager : MonoBehaviour
         await Awaitable.MainThreadAsync();
         data = GameObject.FindWithTag("data").GetComponent<DataScript>();
         audio_head = GameObject.FindWithTag("audio");
+    }
+
+    private async void InitActions()
+    {
+        await Awaitable.MainThreadAsync();
+
+        MenuToIntermediary += LoadingSceneMenuToIntermediary;
     }
 }

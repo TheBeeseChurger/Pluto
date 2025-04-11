@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1001 &1382717852
+--- !u!1001 &1476437008
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -212,6 +212,7 @@ MonoBehaviour:
   _indicator_script: {fileID: 0}
   _score_manager_script: {fileID: 0}
   _blink_text_script: {fileID: 0}
+  prefab: {fileID: 5263041022784550400, guid: 34fa533add4908d4cb56775ce1dcc9c9, type: 3}
 --- !u!4 &1844634405
 Transform:
   m_ObjectHideFlags: 0
@@ -397,7 +398,7 @@ GameObject:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1382717852}
+  - {fileID: 1476437008}
   - {fileID: 1910664285}
   - {fileID: 1844634405}
   - {fileID: 887919550788866197}
