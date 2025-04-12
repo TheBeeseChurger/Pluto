@@ -94,10 +94,17 @@ public class ProjectManager : MonoBehaviour
         _intermediary_manager = FindFirstObjectByType<IntermediaryManager>();
     }
 
-    private async Awaitable IntermediarySceneStart()
+    private async Awaitable IntermediaryScenePreStart()
     {
         SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(SCENE_INTERMEDIARY));
         await _intermediary_manager.IntermediaryPreStart(data, audio_head);
+    }
+
+    private async Awaitable IntermediarySceneStart()
+    {
+        await Awaitable.MainThreadAsync();
+        await Awaitable.WaitForSecondsAsync(1f);
+        _intermediary_manager.IntermediaryStart();
     }
 
     private async Awaitable LoadingSceneInit()
@@ -115,10 +122,11 @@ public class ProjectManager : MonoBehaviour
         await IntermediarySceneInit();
         await Awaitable.WaitForSecondsAsync(0.1f);
         _loading_manager.UpdateProgress(0.75f * 100f);
-        await IntermediarySceneStart();
+        await IntermediaryScenePreStart();
         await Awaitable.WaitForSecondsAsync(0.5f);
         _loading_manager.UpdateProgress((1f) * 100f);
         await _loading_manager.FinishProgress(true);
+        await IntermediarySceneStart();
     }
 
     private async Awaitable InitStatics()

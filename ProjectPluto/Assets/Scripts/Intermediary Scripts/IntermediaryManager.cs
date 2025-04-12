@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -27,9 +28,17 @@ public class IntermediaryManager : MonoBehaviour
 
     Button[] all_buttons;
     Button end_button;
+    Button del_button;
 
     [Header("Initialization References")]
     [SerializeField] GameObject _canvas;
+
+    private bool IsInitializing = true;
+
+    public void IntermediaryStart()
+    {
+        FindFirstObjectByType<EventSystem>().SetSelectedGameObject(all_buttons[^1].gameObject);
+    }
 
     public async Awaitable IntermediaryPreStart(DataScript new_data, GameObject new_audio)
     {
@@ -45,13 +54,18 @@ public class IntermediaryManager : MonoBehaviour
 
         ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
 
-        TimerInit();
-
         await InstantiateAsync(_canvas);
+
+        Init();
+
+        TimerInit();
+        IsInitializing = false;
     }
 
     private void Update()
     {
+        if (IsInitializing) return;
+
         if (timer.Toggle || player_name.Length >= 3)
         {
             input_box.text = player_name;
@@ -68,6 +82,27 @@ public class IntermediaryManager : MonoBehaviour
         {
             end_button.interactable = false;
         }
+    }
+
+    private void Init()
+    {
+        all_buttons = FindObjectsByType<Button>(FindObjectsInactive.Exclude, FindObjectsSortMode.InstanceID);
+
+        input_box = GameObject.FindGameObjectWithTag("Input").GetComponent<TextMeshProUGUI>();
+
+        end_button = GameObject.FindGameObjectWithTag("End").GetComponent<Button>();
+        del_button = GameObject.FindGameObjectWithTag("Del").GetComponent<Button>();
+
+        foreach (Button button in all_buttons)
+        {
+            button.onClick.AddListener(delegate { KeyboardClick(button.name); });
+        }
+
+        end_button.onClick.RemoveAllListeners();
+        del_button.onClick.RemoveAllListeners();
+
+        end_button.onClick.AddListener(KeyboardEnd);
+        del_button.onClick.AddListener(KeyboardRemove);
     }
 
     private void TimerInit()

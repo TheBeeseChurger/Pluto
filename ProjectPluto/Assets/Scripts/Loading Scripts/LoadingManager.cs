@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.InputSystem;
 
 public class LoadingManager : MonoBehaviour
 {
@@ -13,12 +14,17 @@ public class LoadingManager : MonoBehaviour
     [SerializeField] private CanvasGroup scene_alpha;
     [SerializeField] private SpriteRenderer scene_background;
     [SerializeField] private SpriteRenderer scene_icon;
+    [SerializeField] private CanvasGroup CTC_alpha;
 
     [SerializeField] private AudioMixer audio_volume;
 
     [Range(0f, 1f)]
     private float progress = 0f;
     [SerializeField] private RectTransform bar;
+
+    private bool CTC;
+
+    InputSystem_Actions _input_system = null;
 
     [ContextMenu("Update Tip")]
     public void UpdateLoadingTip()
@@ -91,7 +97,39 @@ public class LoadingManager : MonoBehaviour
             await Awaitable.NextFrameAsync();
         }
 
+        CTC = false;
+
+        //Magic Happens
+        _input_system ??= new();
+
+        _input_system.UI.Cancel.performed += OnMyClick;
+        _input_system.UI.Submit.performed += OnMyClick;
+        _input_system.UI.Click.performed += OnMyClick;
+
+        _input_system.UI.Cancel.Enable();
+        _input_system.UI.Submit.Enable();
+        _input_system.UI.Click.Enable();
+
+        while (!CTC)
+        {
+            if (CTC_alpha.alpha < 1f)
+            {
+                CTC_alpha.alpha += 0.4f * Time.deltaTime;
+            }
+
+            await Awaitable.NextFrameAsync();
+        }
+
+        _input_system.UI.Cancel.Disable();
+        _input_system.UI.Submit.Disable();
+        _input_system.UI.Click.Disable();
+
         await FadeSceneOut(audio_change);
+    }
+
+    private void OnMyClick(InputAction.CallbackContext _context)
+    {
+        CTC = true;
     }
 
     private void PickNewLoadingTip()
