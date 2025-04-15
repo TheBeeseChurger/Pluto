@@ -15,6 +15,7 @@ public class ProjectManager : MonoBehaviour
     private MenuManagerScript _menu_manager_script = null;
     private LoadingManager _loading_manager = null;
     private IntermediaryManager _intermediary_manager = null;
+    private GameManager _game_manager = null;
 
     [SerializeField] private DataScript d_prefab;
     [SerializeField] private GameObject a_prefab;
@@ -26,6 +27,7 @@ public class ProjectManager : MonoBehaviour
 
     public static Action MenuToIntermediary;
     public static Action IntermediaryToGame;
+    public static Action GameToGame;
     public static Action GameToMenu;
 
     private async void Start()
@@ -107,6 +109,40 @@ public class ProjectManager : MonoBehaviour
         _intermediary_manager.IntermediaryStart();
     }
 
+    private async Awaitable IntermediarySceneClose()
+    {
+        _intermediary_manager = null;
+
+        await SceneManager.UnloadSceneAsync(SCENE_INTERMEDIARY);
+    }
+
+    private async Awaitable GameSceneInit()
+    {
+        await SceneManager.LoadSceneAsync(SCENE_GAME, LoadSceneMode.Additive);
+
+        _game_manager = FindFirstObjectByType<GameManager>();
+    }
+
+    private async Awaitable GameScenePreStart()
+    {
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(SCENE_GAME));
+        await _game_manager.GamePreStart(data, audio_head);
+    }
+
+    private async Awaitable GameSceneStart()
+    {
+        await Awaitable.MainThreadAsync();
+        await Awaitable.WaitForSecondsAsync(1f);
+        _game_manager.GameStart();
+    }
+
+    private async Awaitable GameSceneClose()
+    {
+        _game_manager = null;
+
+        await SceneManager.UnloadSceneAsync(SCENE_GAME);
+    }
+
     private async Awaitable LoadingSceneInit()
     {
         await SceneManager.LoadSceneAsync(SCENE_LOADING, LoadSceneMode.Additive);
@@ -129,6 +165,35 @@ public class ProjectManager : MonoBehaviour
         await IntermediarySceneStart();
     }
 
+    private async void LoadingSceneIntermediaryToGame()
+    {
+        await _loading_manager.FadeSceneIn(true);
+        await IntermediarySceneClose();
+        _loading_manager.UpdateProgress(0.2f * 100f);
+        await GameSceneInit();
+        await Awaitable.WaitForSecondsAsync(0.1f);
+        _loading_manager.UpdateProgress(0.5f * 100f);
+        await GameScenePreStart();
+        await Awaitable.WaitForSecondsAsync(0.5f);
+        _loading_manager.UpdateProgress((1f) * 100f);
+        await _loading_manager.FinishProgress(true);
+        await GameSceneStart();
+    }
+
+    private async void LoadingSceneGameToGame()
+    {
+        await _loading_manager.FadeSceneIn(true);
+        await GameSceneClose();
+        _loading_manager.UpdateProgress(0.2f * 100f);
+        await GameSceneInit();
+        await Awaitable.WaitForSecondsAsync(0.1f);
+        _loading_manager.UpdateProgress(0.5f * 100f);
+        await GameScenePreStart();
+        await Awaitable.WaitForSecondsAsync(0.5f);
+        _loading_manager.UpdateProgress(1f * 100f);
+        await _loading_manager.FinishProgress(true);
+        await GameSceneStart();
+    }
     private async Awaitable InitStatics()
     {
         await InstantiateAsync(d_prefab);
@@ -144,5 +209,7 @@ public class ProjectManager : MonoBehaviour
         await Awaitable.MainThreadAsync();
 
         MenuToIntermediary += LoadingSceneMenuToIntermediary;
+        IntermediaryToGame += LoadingSceneIntermediaryToGame;
+        GameToGame += LoadingSceneGameToGame;
     }
 }

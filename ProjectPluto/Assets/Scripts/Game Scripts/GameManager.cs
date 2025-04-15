@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -32,12 +33,8 @@ public class GameManager : MonoBehaviour
 
     private bool compass_jammer = false;
 
-    [Header("Data")]
-    [SerializeField] GameObject prefab;
     static DataScript data;
 
-    [Header("Audio")]
-    [SerializeField] GameObject a_prefab;
     static GameObject audio_head;
 
     AudioSource song;
@@ -46,28 +43,18 @@ public class GameManager : MonoBehaviour
     [Header("AudioResource")]
     [SerializeField] AudioResource bgm;
 
-    private void Awake()
+    private bool IsInitalizing = true;
+
+    public async Awaitable GamePreStart(DataScript new_data, GameObject new_audio)
     {
-        if (data == null)
+        if (new_audio != null)
         {
-            GameObject dataobj = GameObject.FindWithTag("data");
-
-            if (dataobj == null)
-            {
-                dataobj = GameObject.Instantiate(prefab);
-            }
-
-            data = dataobj.GetComponent<DataScript>();
+            audio_head = new_audio;
         }
 
-        if (audio_head == null)
+        if (new_data != null)
         {
-            audio_head = GameObject.FindGameObjectWithTag("audio");
-
-            if (audio_head == null)
-            {
-                audio_head = Instantiate(a_prefab);
-            }
+            data = new_data;
         }
 
         song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
@@ -81,6 +68,17 @@ public class GameManager : MonoBehaviour
             song.Play();
         }
 
+        TimerInit();
+    }
+
+    public void GameStart()
+    {
+
+        IsInitalizing = false;
+    }
+
+    private void TimerInit()
+    {
         score_timer = gameObject.AddComponent<Timer>();
 
         score_timer.timer_spd = 1f;
@@ -89,7 +87,7 @@ public class GameManager : MonoBehaviour
         distance_timer = gameObject.AddComponent<Timer>();
 
         distance_timer.timer_spd = 1f;
-        distance_timer .timer_time = 5f;
+        distance_timer.timer_time = 5f;
     }
 
     void Start()
@@ -137,6 +135,8 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (IsInitalizing) return;
+
         if (score_timer.End && score >= 10)
         {
             score -= 10;
