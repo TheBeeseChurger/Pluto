@@ -26,9 +26,10 @@ public class MenuManagerScript : MonoBehaviour
 
     [Header("Initialization References")]
     [SerializeField] GameObject _canvas;
-    [SerializeField] IndicatorScript _indicator_script;
-    [SerializeField] ScoreManagerScript _score_manager_script;
-    [SerializeField] BlinkTextScript _blink_text_script;
+
+    IndicatorScript _indicator_script;
+    ScoreManagerScript _score_manager_script;
+    BlinkTextScript _blink_text_script;
 
     [Header("Intro Animation")]
     [SerializeField] GameObject prefab;

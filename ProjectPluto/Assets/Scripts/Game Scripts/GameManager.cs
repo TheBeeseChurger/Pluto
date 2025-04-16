@@ -1,27 +1,14 @@
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] GeneratorScript maze_gen;
-    [SerializeField] CameraTraceScript tracer;
-
-    [SerializeField] GameObject player1;
-    [SerializeField] GameObject player2;
-    [SerializeField] GameObject evil;
-
-    [SerializeField] GameObject p2compass_hand;
-    [SerializeField] GameObject evcompass_hand;
-
-    [SerializeField] TextMeshProUGUI score_text;
-    [SerializeField] TextMeshProUGUI multiplier_text;
     private static int score = 110;
     private static float score_multiplier = 1f;
+
+    private InputSystem_Actions _input_system;
 
     private Timer score_timer;
     private Timer distance_timer;
@@ -43,6 +30,28 @@ public class GameManager : MonoBehaviour
     [Header("AudioResource")]
     [SerializeField] AudioResource bgm;
 
+    [Header("Initialization References")]
+    [SerializeField] GameObject _maze;
+    [SerializeField] GameObject _tracer;
+    [SerializeField] GameObject _follower;
+    [SerializeField] GameObject _p1;
+    [SerializeField] GameObject _p2;
+    [SerializeField] GameObject _evil;
+
+    GeneratorScript maze_gen;
+    CameraTraceScript tracer;
+    CameraFollowScript follower;
+    GameObject player1;
+    GameObject player2;
+    GameObject evil;
+
+    GameObject p2compass_hand;
+    GameObject evcompass_hand;
+
+    TextMeshProUGUI score_text;
+    TextMeshProUGUI multiplier_text;
+    TextMeshProUGUI round_text;
+
     private bool IsInitalizing = true;
 
     public async Awaitable GamePreStart(DataScript new_data, GameObject new_audio)
@@ -57,8 +66,37 @@ public class GameManager : MonoBehaviour
             data = new_data;
         }
 
-        song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
-        ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
+        Init();
+
+        //Instantiate & Init
+        await Awaitable.MainThreadAsync();
+        await InstantiateAsync(_maze);
+        maze_gen = FindFirstObjectByType<GeneratorScript>();
+
+        await InstantiateAsync(_follower);
+        follower = FindFirstObjectByType<CameraFollowScript>();
+        follower.Init();
+        p2compass_hand = GameObject.Find("ProserpinaHand");
+        evcompass_hand = GameObject.Find("CeresHand");
+        score_text = GameObject.Find("ScoreText").GetComponent<TextMeshProUGUI>();
+        multiplier_text = GameObject.Find("MultiplierText").GetComponent<TextMeshProUGUI>();
+        round_text = GameObject.Find("RoundText").GetComponent<TextMeshProUGUI>();
+
+        await InstantiateAsync(_p1);
+        player1 = GameObject.FindGameObjectWithTag("Player");
+        player1.GetComponent<PlayerScript>().Init(this);
+
+        await InstantiateAsync(_tracer);
+        tracer = FindFirstObjectByType<CameraTraceScript>();
+        tracer.Init();
+
+        await InstantiateAsync(_p2);
+        player2 = GameObject.FindGameObjectWithTag("Player2");
+        player2.GetComponent<AIScript>().Init(this);
+
+        await InstantiateAsync(_evil);
+        evil = GameObject.FindGameObjectWithTag("Evil");
+        evil.GetComponent<AIScript>().Init(this);
 
         if (song.resource != bgm)
         {
@@ -68,13 +106,33 @@ public class GameManager : MonoBehaviour
             song.Play();
         }
 
+        MazeInit();
+        SeeInit();
         TimerInit();
+
+        tracer.CamReset();
     }
 
     public void GameStart()
     {
+        tracer.TraceStart();
+
+        player1.GetComponent<PlayerScript>().PlayerStart();
+        player2.GetComponent<AIScript>().AIStart();
+        evil.GetComponent<AIScript>().AIStart();
+
+        distance_timer.Interrupt();
+        score_timer.Interrupt();
 
         IsInitalizing = false;
+    }
+
+    private void Init()
+    {
+        song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
+        ui = audio_head.transform.GetChild(2).GetComponent<AudioSource>();
+
+        _input_system = new();
     }
 
     private void TimerInit()
@@ -90,7 +148,7 @@ public class GameManager : MonoBehaviour
         distance_timer.timer_time = 5f;
     }
 
-    void Start()
+    private void MazeInit()
     {
         maze_gen.Generate();
 
@@ -98,12 +156,15 @@ public class GameManager : MonoBehaviour
         var p2_cell = maze_gen.GetPlayer2Spawn();
         var evil_cell = maze_gen.GetEvilSpawn();
 
-        player1.transform.position = new Vector3(p1_cell.transform.position.x,p1_cell.transform.position.y, player1.transform.position.z);
+        player1.transform.position = new Vector3(p1_cell.transform.position.x, p1_cell.transform.position.y, player1.transform.position.z);
         player2.transform.position = new Vector3(p2_cell.transform.position.x, p2_cell.transform.position.y, player2.transform.position.z);
         evil.transform.position = new Vector3(evil_cell.transform.position.x, evil_cell.transform.position.y, evil.transform.position.z);
 
-        tracer.CamReset();
+        last_distance = maze_gen.GetCellDistance(p1_cell, p2_cell);
+    }
 
+    private void SeeInit()
+    {
         var start_pos = CalcMazePos(player1.transform.position);
 
         x_pos = (int)start_pos.x;
@@ -127,10 +188,6 @@ public class GameManager : MonoBehaviour
                 SeeAndScore(cell);
             }
         }
-
-        last_distance = maze_gen.GetCellDistance(p1_cell, p2_cell);
-        //Debug.Log("Player spawned " + last_distance + " tiles away from Player 2.");
-        distance_timer.Interrupt();
     }
 
     void Update()
@@ -213,7 +270,9 @@ public class GameManager : MonoBehaviour
         data.CommitScore();
         ResetScore();
 
-        SceneManager.LoadScene("Menu");
+        tracer.TraceStop();
+
+        ProjectManager.GameToMenu.Invoke();
         //END GAME
     }
 
@@ -222,7 +281,7 @@ public class GameManager : MonoBehaviour
         score += (int)(500 * score_multiplier);
         score_multiplier += 0.5f;
 
-        SceneManager.LoadScene("Game");
+        ProjectManager.GameToGame.Invoke();
     }
     
     public List<Vector2> PossibleDirections(Vector2 curr_pos)

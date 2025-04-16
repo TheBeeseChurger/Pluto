@@ -27,9 +27,9 @@ public class LandmarkCellScript : MonoBehaviour
         }
     }
 
-    public void Initialize()
+    public void Initialize(GeneratorScript new_maze)
     {
-        maze = GameObject.Find("Maze").GetComponent<GeneratorScript>();
+        maze = new_maze;
 
         maze_x = (int)transform.localPosition.x;
         maze_y = (int)transform.localPosition.y;
@@ -81,7 +81,6 @@ public class LandmarkCellScript : MonoBehaviour
         {
             clonecell.Lock();
         }
-
 
     }
 }

@@ -2,8 +2,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class IntermediaryManager : MonoBehaviour
@@ -126,7 +124,7 @@ public class IntermediaryManager : MonoBehaviour
     {
         if (player_name.Length > 0)
         {
-            player_name = player_name.Remove(player_name.Length - 1);
+            player_name = player_name[..^1];
         }
     }
 
@@ -139,7 +137,7 @@ public class IntermediaryManager : MonoBehaviour
 
         Name();
 
-        SceneManager.LoadScene("Game");
+        ProjectManager.IntermediaryToGame.Invoke();
     }
 
     public void UISelectSFX()

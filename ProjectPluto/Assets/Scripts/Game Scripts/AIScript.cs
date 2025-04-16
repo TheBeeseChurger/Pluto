@@ -9,7 +9,7 @@ public class AIScript : MonoBehaviour
 
     [SerializeField] private float move_speed;
 
-    [SerializeField] GameManager gm;
+    GameManager gm;
 
     [SerializeField] private AIType type;
     [SerializeField] private AIMode mode;
@@ -34,9 +34,25 @@ public class AIScript : MonoBehaviour
         chase,
         flee
     }
+    bool IsInitializing = true;
+
+    public void Init(GameManager new_gm)
+    {
+        if (new_gm != null)
+        {
+            gm = new_gm;
+        }
+    }
+
+    public void AIStart()
+    {
+        IsInitializing = false;
+    }
 
     void Update()
     {
+        if (IsInitializing) return;
+
         if (!IsMoving)
         {
             IsMoving = true;
@@ -48,6 +64,8 @@ public class AIScript : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (IsInitializing) return;
+
         if (IsMoving)
         {
             var new_pos = Vector2.MoveTowards(transform.position, curr_pos + move_dir, move_speed * Time.deltaTime);
@@ -66,6 +84,8 @@ public class AIScript : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (IsInitializing) return;
+
         switch(type)
         {
             case AIType.p1:

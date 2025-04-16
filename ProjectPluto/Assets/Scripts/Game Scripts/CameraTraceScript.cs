@@ -10,15 +10,34 @@ public class CameraTraceScript : MonoBehaviour
 
     [SerializeField] float move_speed;
 
-    Camera cam;
+    [SerializeField] Camera cam;
+    readonly Vector3 cam_default = new(0f, 0f, -10f);
 
-    private void Start()
+    bool IsInitializing = true;
+
+    public void Init()
     {
-        cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        cam = FindFirstObjectByType<Camera>();
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
     }
+    
+    public void TraceStart()
+    {
+        IsInitializing = false;
+    }
+
+    public void TraceStop()
+    {
+        IsInitializing = true;
+
+        cam.transform.localPosition = cam_default;
+    }
+
 
     void FixedUpdate()
     {
+        if (IsInitializing) return;
+
         var dist = Vector2.Distance(transform.position, player.transform.position);
 
         dist *= move_speed;

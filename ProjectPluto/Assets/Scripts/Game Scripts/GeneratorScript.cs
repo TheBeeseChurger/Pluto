@@ -279,7 +279,7 @@ public class GeneratorScript : MonoBehaviour
         chosen_landmark.transform.parent = transform;
         chosen_landmark.transform.localPosition = new Vector3(x, y, 0);
 
-        chosen_landmark.GetComponent<LandmarkCellScript>().Initialize();
+        chosen_landmark.GetComponent<LandmarkCellScript>().Initialize(this);
     }
 
     private bool EmptyLocation(MazeCellScript bl_cell, MazeCellScript br_cell, MazeCellScript tl_cell, MazeCellScript tr_cell)
