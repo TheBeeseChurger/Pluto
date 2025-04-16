@@ -41,7 +41,7 @@ public class PlayerScript : MonoBehaviour
             vertical *= 0.7f;
         }
 
-        rb.linearVelocity = new Vector2(horizontal * move_speed, vertical * move_speed);
+        rb.linearVelocity = new Vector2(horizontal * move_speed * GameManager.gameTimeScale, vertical * move_speed * GameManager.gameTimeScale);
 
     }
 }

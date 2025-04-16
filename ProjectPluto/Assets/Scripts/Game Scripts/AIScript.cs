@@ -70,7 +70,7 @@ public class AIScript : MonoBehaviour
         {
             var new_pos = Vector2.MoveTowards(transform.position, curr_pos + move_dir, move_speed * Time.deltaTime);
 
-            transform.position = new Vector3(new_pos.x, new_pos.y, -1f);
+            transform.position = new Vector3((new_pos.x) * GameManager.gameTimeScale, (new_pos.y) * GameManager.gameTimeScale, -1f);
 
             if ((Vector2)transform.position == (curr_pos + move_dir))
             {
@@ -84,7 +84,7 @@ public class AIScript : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (IsInitializing) return;
+        if (IsInitializing || GameManager.gameTimeScale == 0f) return;
 
         switch(type)
         {

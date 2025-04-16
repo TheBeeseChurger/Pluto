@@ -194,6 +194,19 @@ public class ProjectManager : MonoBehaviour
         await _loading_manager.FinishProgress(true);
         await GameSceneStart();
     }
+
+    private async void LoadingSceneGameToMenu()
+    {
+        await _loading_manager.FadeSceneIn(true);
+        await GameSceneClose();
+        _loading_manager.UpdateProgress(0.4f * 100f);
+        await MenuSceneInit();
+        await Awaitable.WaitForSecondsAsync(0.1f);
+        _loading_manager.UpdateProgress(1f * 100f);
+        await _loading_manager.FinishProgress(true);
+        await MenuSceneStart();
+    }
+
     private async Awaitable InitStatics()
     {
         await InstantiateAsync(d_prefab);
@@ -211,5 +224,6 @@ public class ProjectManager : MonoBehaviour
         MenuToIntermediary += LoadingSceneMenuToIntermediary;
         IntermediaryToGame += LoadingSceneIntermediaryToGame;
         GameToGame += LoadingSceneGameToGame;
+        GameToMenu += LoadingSceneGameToMenu;
     }
 }

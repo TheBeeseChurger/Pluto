@@ -22,6 +22,8 @@ public class LoadingManager : MonoBehaviour
     private float progress = 0f;
     [SerializeField] private RectTransform bar;
 
+    [SerializeField] private CameraFollowScript cam_follow;
+
     private bool CTC;
 
     InputSystem_Actions _input_system = null;
@@ -51,12 +53,16 @@ public class LoadingManager : MonoBehaviour
             await Awaitable.NextFrameAsync();
             curr_time += Time.deltaTime;
         }
+
+        cam_follow.Init(false);
     }
 
     public async Awaitable FadeSceneIn(bool audio_change = false)
     {
+        SceneReset();
         PickNewLoadingTip();
         UpdateLoadingTip();
+        cam_follow.Init(true);
 
         float curr_time = 0f;
         while (scene_alpha.alpha < 1f)
@@ -71,6 +77,17 @@ public class LoadingManager : MonoBehaviour
             await Awaitable.NextFrameAsync();
             curr_time += Time.deltaTime;
         }
+    }
+
+    private void SceneReset()
+    {
+        scene_alpha.alpha = 0f;
+        scene_background.color = new Color(scene_background.color.r, scene_background.color.g, scene_background.color.b, 0f);
+        scene_icon.color = new Color(scene_icon.color.r, scene_icon.color.g, scene_icon.color.b, 0f);
+        progress = 0f;
+        bar.localScale = new Vector3(0f, bar.localScale.y, bar.localScale.z);
+
+        CTC_alpha.alpha = 0f;
     }
 
     public async void UpdateProgress(float new_progress)

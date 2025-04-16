@@ -54,6 +54,8 @@ public class GameManager : MonoBehaviour
 
     private bool IsInitalizing = true;
 
+    public static float gameTimeScale = 1f;
+
     public async Awaitable GamePreStart(DataScript new_data, GameObject new_audio)
     {
         if (new_audio != null)
@@ -125,6 +127,7 @@ public class GameManager : MonoBehaviour
         score_timer.Interrupt();
 
         IsInitalizing = false;
+        gameTimeScale = 1f;
     }
 
     private void Init()
@@ -199,7 +202,7 @@ public class GameManager : MonoBehaviour
             score -= 10;
         }
 
-        if (distance_timer.End)
+        if (distance_timer.End && gameTimeScale != 0f)
         {
             last_distance = maze_gen.GetCellDistance(CalcMazePos(player1.transform.position), CalcMazePos(player2.transform.position));
 
@@ -266,6 +269,8 @@ public class GameManager : MonoBehaviour
 
     public void EndGame()
     {
+        gameTimeScale = 0f;
+
         data.AddScore(score);
         data.CommitScore();
         ResetScore();
@@ -278,6 +283,8 @@ public class GameManager : MonoBehaviour
 
     public void NextRound()
     {
+        gameTimeScale = 0f;
+
         score += (int)(500 * score_multiplier);
         score_multiplier += 0.5f;
 

@@ -6,11 +6,11 @@ public class CameraFollowScript : MonoBehaviour
 
     bool IsInitializing = true;
 
-    public void Init()
+    public void Init(bool OnOff = true)
     {
         cam = GameObject.FindGameObjectWithTag("MainCamera");
 
-        IsInitializing = false;
+        IsInitializing = !OnOff;
     }
     
     void Update()

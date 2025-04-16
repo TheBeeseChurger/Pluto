@@ -349,7 +349,7 @@ Transform:
   m_GameObject: {fileID: 360278220}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.9854875, y: -3.3850758, z: 1.3518934}
+  m_LocalPosition: {x: 5.27, y: -2.56, z: 1.3518934}
   m_LocalScale: {x: 3, y: 3, z: 0}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -457,7 +457,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.03451261, y: -0.88507587}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 879, y: 494.59998}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &662239391
@@ -541,7 +541,7 @@ Transform:
   m_GameObject: {fileID: 662239391}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.03451261, y: -0.88507587, z: 1.3518934}
+  m_LocalPosition: {x: 0, y: 0, z: 1.3518934}
   m_LocalScale: {x: 18, y: 10, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -619,6 +619,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1664542197}
   - component: {fileID: 1664542198}
+  - component: {fileID: 1664542199}
   m_Layer: 0
   m_Name: Scene
   m_TagString: Untagged
@@ -635,7 +636,7 @@ Transform:
   m_GameObject: {fileID: 1664542196}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.03451261, y: 0.88507587, z: -1.3518934}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -656,6 +657,18 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1664542199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664542196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28dd30352e794e941b1965b8eb93840d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1668160111
 GameObject:
   m_ObjectHideFlags: 0
@@ -982,6 +995,7 @@ MonoBehaviour:
   CTC_alpha: {fileID: 137944773}
   audio_volume: {fileID: 24100000, guid: 098b32ae287288a478773e046be6a3ac, type: 2}
   bar: {fileID: 8599303435268657011}
+  cam_follow: {fileID: 1664542199}
 --- !u!4 &2086403933
 Transform:
   m_ObjectHideFlags: 0

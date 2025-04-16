@@ -17,7 +17,7 @@ public class Timer : MonoBehaviour
     {
         if (timer_spd == 0) return;
 
-        curtime -= Time.deltaTime;
+        curtime -= (Time.deltaTime) * GameManager.gameTimeScale;
         End = false;
 
         if (curtime <= 0)

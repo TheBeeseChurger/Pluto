@@ -53,9 +53,9 @@ public class CameraTraceScript : MonoBehaviour
 
         var new_vec2 = Vector2.MoveTowards(transform.position, player.transform.position, dist);
 
-        transform.position = new Vector3(new_vec2.x, new_vec2.y, -1f);
+        transform.position = new Vector3((new_vec2.x) * GameManager.gameTimeScale, (new_vec2.y) * GameManager.gameTimeScale, -1f);
 
-        cam.transform.position = new Vector3(new_vec2.x, new_vec2.y, -10f);
+        cam.transform.position = new Vector3((new_vec2.x) * GameManager.gameTimeScale, (new_vec2.y) * GameManager.gameTimeScale, -10f);
     }
 
     public void CamReset()
