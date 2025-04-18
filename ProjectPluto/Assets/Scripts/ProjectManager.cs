@@ -141,6 +141,8 @@ public class ProjectManager : MonoBehaviour
         _game_manager = null;
 
         await SceneManager.UnloadSceneAsync(SCENE_GAME);
+
+        GameManager.gameTimeScale = 1f;
     }
 
     private async Awaitable LoadingSceneInit()

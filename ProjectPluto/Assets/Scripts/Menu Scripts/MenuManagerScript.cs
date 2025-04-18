@@ -75,7 +75,8 @@ public class MenuManagerScript : MonoBehaviour
         song.loop = true;
         song.Play();
         
-        FindAnyObjectByType<Animator>().Play("Open");
+        if (game_start == 1)
+            FindAnyObjectByType<Animator>().Play("Open");
     }
 
     private void Init()
