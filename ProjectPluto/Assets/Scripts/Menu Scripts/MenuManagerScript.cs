@@ -74,9 +74,17 @@ public class MenuManagerScript : MonoBehaviour
         song.resource = bgm;
         song.loop = true;
         song.Play();
+
+        GameManager.gameTimeScale = 1f;
         
         if (game_start == 1)
+        {
             FindAnyObjectByType<Animator>().Play("Open");
+        } else
+        {
+            FindAnyObjectByType<Animator>().Play("Screen Fade");
+        }
+            
     }
 
     private void Init()

@@ -48,6 +48,8 @@ public class GameManager : MonoBehaviour
     GameObject p2compass_hand;
     GameObject evcompass_hand;
 
+    float compass_rand_dir = 0f;
+
     TextMeshProUGUI score_text;
     TextMeshProUGUI multiplier_text;
     TextMeshProUGUI round_text;
@@ -371,19 +373,21 @@ public class GameManager : MonoBehaviour
 
         if (compass_jammer || (dist1.magnitude < 5f || dist2.magnitude < 5f))
         {
-            var ang1 = Random.Range(-180, 180);
-            var ang2 = Random.Range(-180, 180);
+            if (compass_rand_dir == 0f)
+            {
+                compass_rand_dir = 100f;
+            }
 
-            Quaternion quat1 = Quaternion.Euler(0f, 0f, ang1);
-            Quaternion quat2 = Quaternion.Euler(0f, 0f, ang2);
+            Quaternion quat1 = Quaternion.Euler(0f, 0f, compass_rand_dir * Time.deltaTime);
+            Quaternion quat2 = Quaternion.Euler(0f, 0f, compass_rand_dir * Time.deltaTime);
 
-            p2compass_hand.transform.rotation = Quaternion.RotateTowards(p2compass_hand.transform.rotation, quat1,
-                Mathf.Abs(p2compass_hand.transform.rotation.eulerAngles.z - ang1) * Random.Range(0.5f, 4.5f) * Time.deltaTime);
-            evcompass_hand.transform.rotation = Quaternion.RotateTowards(evcompass_hand.transform.rotation, quat2,
-                Mathf.Abs(p2compass_hand.transform.rotation.eulerAngles.z - ang2) * Random.Range(0.5f, 4.5f) * Time.deltaTime);
+            p2compass_hand.transform.rotation *= quat1;
+            evcompass_hand.transform.rotation *= quat2;
 
             return;
         }
+
+        compass_rand_dir = 0f;
 
         var dir1 = (dist1).normalized;
         var dir2 = (dist2).normalized;
