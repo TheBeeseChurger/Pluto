@@ -166,6 +166,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   move_speed: 1.85
-  gm: {fileID: 0}
   type: 2
   mode: 0

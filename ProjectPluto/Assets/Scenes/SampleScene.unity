@@ -884,6 +884,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tv Open Prefab
       objectReference: {fileID: 0}
+    - target: {fileID: 5263041022784550400, guid: 34fa533add4908d4cb56775ce1dcc9c9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7767149689446552173, guid: 34fa533add4908d4cb56775ce1dcc9c9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
