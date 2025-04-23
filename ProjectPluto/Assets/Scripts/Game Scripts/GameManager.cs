@@ -45,6 +45,8 @@ public class GameManager : MonoBehaviour
     GameObject player2;
     GameObject evil;
 
+    RoundTriggerScript[] player2_triggers;
+
     GameObject p2compass_hand;
     GameObject evcompass_hand;
 
@@ -97,6 +99,12 @@ public class GameManager : MonoBehaviour
         await InstantiateAsync(_p2);
         player2 = GameObject.FindGameObjectWithTag("Player2");
         player2.GetComponent<AIScript>().Init(this);
+        player2_triggers = FindObjectsByType<RoundTriggerScript>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+
+        foreach (var trigger in player2_triggers)
+        {
+            trigger.Init(this);
+        }
 
         await InstantiateAsync(_evil);
         evil = GameObject.FindGameObjectWithTag("Evil");
@@ -212,7 +220,7 @@ public class GameManager : MonoBehaviour
 
             if (last_distance < 3)
             {
-                NextRound();
+                //NextRound();
             }
             else if (last_distance < 10)
             {
@@ -375,11 +383,11 @@ public class GameManager : MonoBehaviour
         {
             if (compass_rand_dir == 0f)
             {
-                compass_rand_dir = 100f;
+                compass_rand_dir = 200f * Random.Range(0.5f, 1.5f);
             }
 
             Quaternion quat1 = Quaternion.Euler(0f, 0f, compass_rand_dir * Time.deltaTime);
-            Quaternion quat2 = Quaternion.Euler(0f, 0f, compass_rand_dir * Time.deltaTime);
+            Quaternion quat2 = Quaternion.Euler(0f, 0f, -compass_rand_dir * Time.deltaTime);
 
             p2compass_hand.transform.rotation *= quat1;
             evcompass_hand.transform.rotation *= quat2;

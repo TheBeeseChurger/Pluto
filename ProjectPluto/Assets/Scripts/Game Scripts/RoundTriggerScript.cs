@@ -3,6 +3,7 @@ using UnityEngine;
 public class RoundTriggerScript : MonoBehaviour
 {
     Collider2D blocker;
+    GameManager gameManager;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -13,7 +14,7 @@ public class RoundTriggerScript : MonoBehaviour
             blocker = other;
         } else
         {
-            //Do Something Here
+            gameManager.NextRound();
         }
     }
 
@@ -26,7 +27,7 @@ public class RoundTriggerScript : MonoBehaviour
             blocker = other;
         } else
         {
-            //Do Something Here
+            gameManager.NextRound();
         }
     }
 
@@ -36,5 +37,10 @@ public class RoundTriggerScript : MonoBehaviour
         {
             blocker = null;
         }
+    }
+
+    public void Init(GameManager _gameManager)
+    {
+        gameManager = _gameManager;
     }
 }
