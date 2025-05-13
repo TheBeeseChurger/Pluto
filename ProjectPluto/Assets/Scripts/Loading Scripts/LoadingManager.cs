@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -24,6 +25,11 @@ public class LoadingManager : MonoBehaviour
 
     [SerializeField] private CameraFollowScript cam_follow;
 
+    [Header("Initialization References")]
+    [SerializeField] GameObject _game_animators;
+    
+    GameEndController _end_controller;
+
     private bool CTC;
 
     InputSystem_Actions _input_system = null;
@@ -36,6 +42,61 @@ public class LoadingManager : MonoBehaviour
 
         random_text.text = current_tip.text;
         random_sprite.sprite = current_tip.sprite;
+    }
+
+    public async Awaitable ControllerInit()
+    {
+        await InstantiateAsync(_game_animators);
+
+        _end_controller = FindFirstObjectByType<GameEndController>();
+        _end_controller.GetComponent<CameraFollowScript>().Init(true);
+        _end_controller.Init();
+    }
+
+    public async Awaitable PlayAnimation(bool game_over)
+    {
+        if (_end_controller == null) return;
+
+        if (game_over) _end_controller.PlayGameOver();
+        else _end_controller.PlayRoundEnd();
+
+        await Awaitable.WaitForSecondsAsync(12f);
+    }
+
+    public async Awaitable FadeBlankSceneOut(bool audio_change = false)
+    {
+        float curr_time = 0f;
+        while (scene_background.color.a > 0f)
+        {
+            var alpha = Mathf.Lerp(1f, 0f, curr_time / 1f);
+
+            scene_background.color = new Color(scene_background.color.r, scene_background.color.g, scene_background.color.b, alpha);
+            if (audio_change) audio_volume.SetFloat("Volume", ((1f - alpha) * 80f) - 80f);
+
+            await Awaitable.NextFrameAsync();
+            curr_time += Time.deltaTime;
+        }
+
+        cam_follow.Init(false);
+
+        if(_end_controller != null) Destroy(_end_controller.gameObject);
+    }
+
+    public async Awaitable FadeBlankSceneIn(bool audio_change = false)
+    {
+        cam_follow.Init(true);
+
+        float curr_time = 0f;
+        while (scene_background.color.a < 1f)
+        {
+            var alpha = Mathf.Lerp(0f, 1f, curr_time / 1f);
+
+            scene_background.color = new Color(scene_background.color.r, scene_background.color.g, scene_background.color.b, alpha);
+            if (audio_change) audio_volume.SetFloat("Volume", ((1f - alpha) * 80f) - 80f);
+
+            await Awaitable.NextFrameAsync();
+            curr_time += Time.deltaTime;
+        }
     }
 
     public async Awaitable FadeSceneOut(bool audio_change = false)

@@ -996,6 +996,7 @@ MonoBehaviour:
   audio_volume: {fileID: 24100000, guid: 098b32ae287288a478773e046be6a3ac, type: 2}
   bar: {fileID: 8599303435268657011}
   cam_follow: {fileID: 1664542199}
+  _game_animators: {fileID: 5093893645890000618, guid: 1e2954519ca7dd74ba6dc432a6ba0ea8, type: 3}
 --- !u!4 &2086403933
 Transform:
   m_ObjectHideFlags: 0

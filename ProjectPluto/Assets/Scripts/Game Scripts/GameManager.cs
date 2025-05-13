@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 {
     private static int score = 110;
     private static float score_multiplier = 1f;
+    public static int round = 0;
 
     private InputSystem_Actions _input_system;
 
@@ -123,6 +124,9 @@ public class GameManager : MonoBehaviour
         TimerInit();
 
         tracer.CamReset();
+
+        round++;
+        round_text.text = "Round:" + round;
     }
 
     public void GameStart()
@@ -205,6 +209,9 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (score_text != null) score_text.text = "Score:" + score;
+        if (multiplier_text != null) multiplier_text.text = "Multipler x" + score_multiplier;
+
         if (IsInitalizing) return;
 
         if (score_timer.End && score >= 10)
@@ -247,9 +254,6 @@ public class GameManager : MonoBehaviour
                 //Debug.Log("Distance greater than 40, updating distance slowly.");
             }
         }
-
-        score_text.text = "Score:" + score;
-        multiplier_text.text = "Multipler x" + score_multiplier;
 
         var curr_pos = CalcMazePos(player1.transform.position);
 
@@ -358,6 +362,7 @@ public class GameManager : MonoBehaviour
     {
         score = 110;
         score_multiplier = 1;
+        round = 0;
     }
 
     private void SeeAndScore(MazeCellScript cell)

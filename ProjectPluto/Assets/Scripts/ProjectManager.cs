@@ -182,28 +182,35 @@ public class ProjectManager : MonoBehaviour
 
     private async void LoadingSceneGameToGame()
     {
-        await _loading_manager.FadeSceneIn(true);
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(SCENE_LOADING));
+        await _loading_manager.ControllerInit();
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(SCENE_GAME));
+
+        await _loading_manager.FadeBlankSceneIn(true);
+        var _await = _loading_manager.PlayAnimation(false);
         await GameSceneClose();
-        _loading_manager.UpdateProgress(0.2f * 100f);
         await GameSceneInit();
         await Awaitable.WaitForSecondsAsync(0.1f);
-        _loading_manager.UpdateProgress(0.5f * 100f);
         await GameScenePreStart();
-        await Awaitable.WaitForSecondsAsync(0.5f);
-        _loading_manager.UpdateProgress(1f * 100f);
-        await _loading_manager.FinishProgress(true);
+        await Awaitable.WaitForSecondsAsync(2f);
+        await _await;
+        await _loading_manager.FadeBlankSceneOut(true);
         await GameSceneStart();
     }
 
     private async void LoadingSceneGameToMenu()
     {
-        await _loading_manager.FadeSceneIn(true);
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(SCENE_LOADING));
+        await _loading_manager.ControllerInit();
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(SCENE_GAME));
+
+        await _loading_manager.FadeBlankSceneIn(true);
+        var _await = _loading_manager.PlayAnimation(true);
         await GameSceneClose();
-        _loading_manager.UpdateProgress(0.4f * 100f);
         await MenuSceneInit();
-        await Awaitable.WaitForSecondsAsync(0.1f);
-        _loading_manager.UpdateProgress(1f * 100f);
-        await _loading_manager.FinishProgress(true);
+        await Awaitable.WaitForSecondsAsync(2f);
+        await _await;
+        await _loading_manager.FadeBlankSceneOut(true);
         await MenuSceneStart();
     }
 
