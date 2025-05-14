@@ -166,5 +166,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   move_speed: 1.85
-  type: 2
-  mode: 0
+  run_speed: 2.5
+  my_type: 2
+  my_mode: 0

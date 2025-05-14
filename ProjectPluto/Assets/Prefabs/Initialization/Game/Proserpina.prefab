@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5722553569426042469}
   - component: {fileID: 6594212952864302156}
   - component: {fileID: 974614994654008334}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Dir1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 3903160852110385485}
   - component: {fileID: 4528102767665420100}
   - component: {fileID: 9216646181142158380}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Dir2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -352,8 +352,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   move_speed: 1.85
-  type: 1
-  mode: 0
+  run_speed: 2.5
+  my_type: 1
+  my_mode: 0
 --- !u!1 &7889610084844078316
 GameObject:
   m_ObjectHideFlags: 0
@@ -365,7 +366,7 @@ GameObject:
   - component: {fileID: 5300072662243400290}
   - component: {fileID: 3181491830117949434}
   - component: {fileID: 7473829396196632921}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Dir3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -456,7 +457,7 @@ GameObject:
   - component: {fileID: 5883780681982628166}
   - component: {fileID: 1425025316718383858}
   - component: {fileID: 6894414443280680845}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Dir4
   m_TagString: Untagged
   m_Icon: {fileID: 0}

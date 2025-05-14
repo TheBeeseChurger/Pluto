@@ -8,15 +8,16 @@ public class AIScript : MonoBehaviour
     private int vertical;
 
     [SerializeField] private float move_speed;
+    [SerializeField] private float run_speed;
 
     GameManager gm;
 
-    [SerializeField] private AIType type;
-    [SerializeField] private AIMode mode;
+    [SerializeField] private AIType my_type;
+    [SerializeField] private AIMode my_mode;
 
     private Vector2 run_dir;
     private Vector2 move_dir;
-    private Vector2 curr_pos;
+    private Vector2 starting_pos;
     private Vector2 last_dir;
 
     private bool IsMoving;
@@ -57,7 +58,7 @@ public class AIScript : MonoBehaviour
         {
             IsMoving = true;
             
-            curr_pos = transform.position;
+            starting_pos = transform.position;
             PickNewDirection();
         }
     }
@@ -68,11 +69,15 @@ public class AIScript : MonoBehaviour
 
         if (IsMoving)
         {
-            var new_pos = Vector2.MoveTowards(transform.position, curr_pos + move_dir, move_speed * Time.deltaTime);
+            Vector2 new_pos;
+            if (run_dir == Vector2.zero) new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, move_speed * Time.deltaTime);
+            else new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, run_speed * Time.deltaTime);
 
             transform.position = new Vector3((new_pos.x) * GameManager.gameTimeScale, (new_pos.y) * GameManager.gameTimeScale, -1f);
 
-            if ((Vector2)transform.position == (curr_pos + move_dir))
+            Debug.DrawLine(transform.position, starting_pos + move_dir);
+
+            if ((Vector2)transform.position == (starting_pos + move_dir))
             {
                 last_dir = move_dir;
                 last_dir.Scale(new Vector2(-1f, -1f));
@@ -86,31 +91,10 @@ public class AIScript : MonoBehaviour
     {
         if (IsInitializing || GameManager.gameTimeScale == 0f) return;
 
-        switch(type)
+        switch(my_type)
         {
             case AIType.p1:
-                if (collision.collider.CompareTag("Player2"))
-                {
-                    gm.NextRound();
-                }
-
-                if (collision.collider.CompareTag("Evil"))
-                {
-                    gm.EndGame();
-                }
-
-                break;
             case AIType.p2:
-                if (collision.collider.CompareTag("Player"))
-                {
-                    gm.NextRound();
-                }
-
-                if (collision.collider.CompareTag("Evil"))
-                {
-                    gm.EndGame();
-                }
-
                 break;
             case AIType.evil:
                 if (collision.collider.CompareTag("Player") || collision.collider.CompareTag("Player2"))
@@ -135,9 +119,8 @@ public class AIScript : MonoBehaviour
                 poss_dirs.Remove(last_dir);
             }
         }
-        
 
-        switch(mode)
+        switch(my_mode)
         {
             case AIMode.wander:
                 var chosen_dir = poss_dirs[Random.Range(0, poss_dirs.Count)];
@@ -147,8 +130,18 @@ public class AIScript : MonoBehaviour
 
                 break;
             case AIMode.chase:
-                horizontal = (int)run_dir.x;
-                vertical = (int)run_dir.y;
+                if (poss_dirs.Contains(run_dir))
+                {
+                    horizontal = (int)run_dir.x;
+                    vertical = (int)run_dir.y;
+                }
+                else
+                {
+                    var rand_dir = poss_dirs[Random.Range(0, poss_dirs.Count)];
+
+                    horizontal = (int)rand_dir.x;
+                    vertical = (int)rand_dir.y;
+                }
 
                 break;
             case AIMode.flee:
@@ -173,24 +166,33 @@ public class AIScript : MonoBehaviour
 
     private void ChangeMode(IEnumerable<Vector2> dirs)
     {
+        bool found_hit = false;
         foreach(var dir in dirs)
         {
-            var hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.51f), dir);
+            RaycastHit2D hit;
+            if(my_type != AIType.evil) hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.51f), dir);
+            else hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.71f), dir);
 
-            if (!hit)
+            if (!hit.collider) continue;
+            
+            if (!hit.collider.CompareTag("Wall"))
             {
-                mode = AIMode.wander;
+                my_mode = CheckHit(hit, dir);
+                found_hit = true;
                 continue;
             }
-            
-            if (!hit.collider.CompareTag("Untagged"))
-                mode = CheckHit(hit, dir);
+        }
+
+        if (!found_hit)
+        {
+            my_mode = AIMode.wander;
+            run_dir = Vector2.zero;
         }
     }
 
     private AIMode CheckHit(RaycastHit2D hit, Vector2 dir)
     {
-        switch (type)
+        switch (my_type)
         {
             case AIType.p1:
                 if (hit.collider.CompareTag("Player2"))
@@ -224,7 +226,6 @@ public class AIScript : MonoBehaviour
                 if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Player2"))
                 {
                     run_dir = dir;
-                    //Debug.Log("Chasing");
                     return AIMode.chase;
                 }
 
