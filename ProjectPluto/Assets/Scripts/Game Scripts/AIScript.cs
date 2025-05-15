@@ -21,6 +21,11 @@ public class AIScript : MonoBehaviour
     private Vector2 last_dir;
 
     private bool IsMoving;
+    private bool IsChasing;
+
+    private Vector2 last_seen_pos;
+
+    private string chasing_tag;
 
     public enum AIType
     {
@@ -54,6 +59,13 @@ public class AIScript : MonoBehaviour
     {
         if (IsInitializing) return;
 
+        if (IsChasing)
+        {
+            last_seen_pos = CheckChase();
+            Debug.Log("Currently chasing. Last seen at: " +  last_seen_pos);
+            Debug.DrawLine(transform.position, last_seen_pos);
+        }
+
         if (!IsMoving)
         {
             IsMoving = true;
@@ -70,8 +82,8 @@ public class AIScript : MonoBehaviour
         if (IsMoving)
         {
             Vector2 new_pos;
-            if (run_dir == Vector2.zero) new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, move_speed * Time.deltaTime);
-            else new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, run_speed * Time.deltaTime);
+            if (run_dir == Vector2.zero) new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, move_speed * Time.fixedDeltaTime);
+            else new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, run_speed * Time.fixedDeltaTime);
 
             transform.position = new Vector3((new_pos.x) * GameManager.gameTimeScale, (new_pos.y) * GameManager.gameTimeScale, -1f);
 
@@ -110,7 +122,7 @@ public class AIScript : MonoBehaviour
     {
         List<Vector2> poss_dirs = gm.PossibleDirections(transform.position);
 
-        ChangeMode(poss_dirs);
+        if (!IsChasing) ChangeMode(poss_dirs);
 
         if (Random.Range(0f, 1f) < 0.8f)
         {
@@ -170,8 +182,8 @@ public class AIScript : MonoBehaviour
         foreach(var dir in dirs)
         {
             RaycastHit2D hit;
-            if(my_type != AIType.evil) hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.51f), dir);
-            else hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.71f), dir);
+            if(my_type != AIType.evil) hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.51f), dir, 5.0f);
+            else hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.71f), dir, 5.0f);
 
             if (!hit.collider) continue;
             
@@ -198,6 +210,8 @@ public class AIScript : MonoBehaviour
                 if (hit.collider.CompareTag("Player2"))
                 {
                     run_dir = dir;
+                    IsChasing = true;
+                    chasing_tag = hit.collider.tag;
                     return AIMode.chase;
                 }
 
@@ -212,6 +226,8 @@ public class AIScript : MonoBehaviour
                 if (hit.collider.CompareTag("Player"))
                 {
                     run_dir = dir;
+                    IsChasing = true;
+                    chasing_tag = hit.collider.tag;
                     return AIMode.chase;
                 }
 
@@ -226,6 +242,8 @@ public class AIScript : MonoBehaviour
                 if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Player2"))
                 {
                     run_dir = dir;
+                    IsChasing = true;
+                    chasing_tag = hit.collider.tag;
                     return AIMode.chase;
                 }
 
@@ -234,5 +252,28 @@ public class AIScript : MonoBehaviour
 
         run_dir = Vector2.zero;
         return AIMode.wander;
-    } 
+    }
+
+    private Vector2 CheckChase()
+    {
+        List<Vector2> poss_dirs = gm.PossibleDirections(transform.position);
+
+        foreach (Vector2 dir in poss_dirs)
+        {
+            RaycastHit2D hit;
+            if (my_type != AIType.evil) hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.51f), dir, 5.0f);
+            else hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.71f), dir, 5.0f);
+
+            if (!hit.collider) continue;
+
+            if (hit.collider.CompareTag(chasing_tag))
+            {
+                run_dir = dir;
+                return hit.transform.position;
+            }
+        }
+
+        IsChasing = false;
+        return last_seen_pos;
+    }
 }
