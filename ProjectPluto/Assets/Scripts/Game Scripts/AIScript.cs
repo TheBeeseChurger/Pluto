@@ -61,10 +61,11 @@ public class AIScript : MonoBehaviour
 
         if (IsChasing)
         {
-            last_seen_pos = CheckChase();
+            last_seen_pos = CheckSight();
             Debug.Log("Currently chasing. Last seen at: " +  last_seen_pos);
-            Debug.DrawLine(transform.position, last_seen_pos);
         }
+        
+        if (last_seen_pos != Vector2.zero) Debug.DrawLine(transform.position, last_seen_pos);
 
         if (!IsMoving)
         {
@@ -254,7 +255,7 @@ public class AIScript : MonoBehaviour
         return AIMode.wander;
     }
 
-    private Vector2 CheckChase()
+    private Vector2 CheckSight()
     {
         List<Vector2> poss_dirs = gm.PossibleDirections(transform.position);
 
@@ -273,7 +274,9 @@ public class AIScript : MonoBehaviour
             }
         }
 
+        Vector2 last_maze_pos = GameObject.FindGameObjectWithTag(chasing_tag).transform.position;
         IsChasing = false;
-        return last_seen_pos;
+        chasing_tag = null;
+        return last_maze_pos;
     }
 }
