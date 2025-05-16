@@ -344,19 +344,29 @@ public class GameManager : MonoBehaviour
         return result;
     }
 
-    private Vector2 CalcMazePos(Vector3 pos)
+    public Vector2 CalcMazePos(Vector3 pos)
     {
         return CalcMazePos(pos.x, pos.y);
     }
 
-    private Vector2 CalcMazePos(Vector2 pos)
+    public Vector2 CalcMazePos(Vector2 pos)
     {
         return CalcMazePos(pos.x, pos.y);
     }
 
-    private Vector2 CalcMazePos(float x, float y)
+    public Vector2 CalcMazePos(float x, float y)
     {
         return new Vector2(x - maze_gen.transform.position.x + 0.5f, y - maze_gen.transform.position.y + 0.5f);
+    }
+
+    public MazeCellScript GetMazeCell(Vector2 pos)
+    {
+        return maze_gen.GetCell((int)pos.x, (int)pos.y);
+    }
+
+    public IEnumerable<MazeCellScript> GetMazeConnectedCell(MazeCellScript cell)
+    {
+        return maze_gen.GetConnectedCells(cell);
     }
 
     private void ResetScore()

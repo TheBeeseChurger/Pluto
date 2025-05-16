@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters;
 using UnityEngine;
 
 public class AIScript : MonoBehaviour
@@ -124,6 +125,7 @@ public class AIScript : MonoBehaviour
         List<Vector2> poss_dirs = gm.PossibleDirections(transform.position);
 
         if (!IsChasing) ChangeMode(poss_dirs);
+        else run_dir = BFSPathFind(CurrentNearestCell(transform.position), CurrentNearestCell(last_seen_pos));
 
         if (Random.Range(0f, 1f) < 0.8f)
         {
@@ -274,9 +276,73 @@ public class AIScript : MonoBehaviour
             }
         }
 
-        Vector2 last_maze_pos = GameObject.FindGameObjectWithTag(chasing_tag).transform.position;
-        IsChasing = false;
-        chasing_tag = null;
-        return last_maze_pos;
+        Vector2 curr_maze_pos = CurrentNearestCell(GameObject.FindGameObjectWithTag(chasing_tag).transform.position);
+        Vector2 last_maze_pos = CurrentNearestCell(last_seen_pos);
+
+        if (last_maze_pos != curr_maze_pos)
+        {
+            IsChasing = false;
+            chasing_tag = null;
+        }
+        return curr_maze_pos;
+    }
+
+    private Vector2 CurrentNearestCell(Vector2 pos)
+    {
+        Vector2 res = gm.CalcMazePos(pos);
+        return new Vector2(Mathf.Round(res.x), Mathf.Round(res.y));
+    }
+    private Vector2 BFSPathFind(Vector2 start, Vector2 end)
+    {
+        const int _max_distance = 10;
+        Queue<KeyValuePair<MazeCellScript, int>> queue = new();
+        bool[,] seen = new bool[21, 21];
+        Vector2 seen_offset = new(start.x - 10.0f, start.y - 10.0f);
+        Vector2 start_plus_one = start;
+
+        queue.Enqueue(new KeyValuePair<MazeCellScript, int>(gm.GetMazeCell(start), 0));
+        seen[10, 10] = true;
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            MazeCellScript current_cell = current.Key;
+            int current_distance = current.Value;
+
+            if (current_distance == 1)
+            {
+                start_plus_one = gm.CalcMazePos(current_cell.transform.position);
+            }
+
+            if (current_cell == gm.GetMazeCell(end))
+            {
+                break;
+            }
+
+            if (current_distance >= _max_distance) continue;
+
+            var cells = gm.GetMazeConnectedCell(current_cell);
+
+            foreach(var cell in cells)
+            {
+                var pos = gm.CalcMazePos(cell.transform.position);
+
+                var seen_pos = (pos - seen_offset);
+
+                if (!seen[(int)seen_pos.x, (int)seen_pos.y])
+                {
+                    seen[(int)seen_pos.x, (int)seen_pos.y] = true;
+                    queue.Enqueue(new KeyValuePair<MazeCellScript, int>(cell, current_distance + 1));
+                }
+            }
+        }
+
+        if (queue.Count == 0) Debug.LogError("PATHFIND ERROR: No Path Found");
+        else
+        {
+            return (start - start_plus_one);
+        }
+
+        return Vector2.zero;
     }
 }
