@@ -2,6 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters;
 using UnityEngine;
+using Vec2ExtensionMethods;
+
+namespace Vec2ExtensionMethods
+{
+    public static class Extensions
+    {
+        public static Vector2 Sub(this Vector2 left, float right)
+            => new(left.x - right, left.y - right);
+
+        public static Vector2 Add(this Vector2 left, float right)
+            => new(left.x + right, left.y + right);
+
+        public static Vector2 Round(this Vector2 left)
+            => new(Mathf.Round(left.x), Mathf.Round(left.y));
+    }
+}
 
 public class AIScript : MonoBehaviour
 {
@@ -63,15 +79,15 @@ public class AIScript : MonoBehaviour
         if (IsChasing)
         {
             last_seen_pos = CheckSight();
-            Debug.Log("Currently chasing. Last seen at: " +  last_seen_pos);
+            Debug.Log("Currently chasing. Last seen at: " + last_seen_pos);
         }
-        
+
         if (last_seen_pos != Vector2.zero) Debug.DrawLine(transform.position, last_seen_pos);
 
         if (!IsMoving)
         {
             IsMoving = true;
-            
+
             starting_pos = transform.position;
             PickNewDirection();
         }
@@ -86,8 +102,8 @@ public class AIScript : MonoBehaviour
             Vector2 new_pos;
             if (run_dir == Vector2.zero) new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, move_speed * Time.fixedDeltaTime);
             else new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, run_speed * Time.fixedDeltaTime);
-
-            transform.position = new Vector3((new_pos.x) * GameManager.gameTimeScale, (new_pos.y) * GameManager.gameTimeScale, -1f);
+            new_pos *= GameManager.gameTimeScale;
+            transform.position = new Vector3(new_pos.x, new_pos.y, -1f);
 
             Debug.DrawLine(transform.position, starting_pos + move_dir);
 
@@ -105,7 +121,7 @@ public class AIScript : MonoBehaviour
     {
         if (IsInitializing || GameManager.gameTimeScale == 0f) return;
 
-        switch(my_type)
+        switch (my_type)
         {
             case AIType.p1:
             case AIType.p2:
@@ -124,6 +140,11 @@ public class AIScript : MonoBehaviour
     {
         List<Vector2> poss_dirs = gm.PossibleDirections(transform.position);
 
+        if (CurrentNearestCell(last_seen_pos) == CurrentNearestCell(transform.position))
+        {
+            IsChasing = false;
+        }
+
         if (!IsChasing) ChangeMode(poss_dirs);
         else run_dir = BFSPathFind(CurrentNearestCell(transform.position), CurrentNearestCell(last_seen_pos));
 
@@ -135,7 +156,7 @@ public class AIScript : MonoBehaviour
             }
         }
 
-        switch(my_mode)
+        switch (my_mode)
         {
             case AIMode.wander:
                 var chosen_dir = poss_dirs[Random.Range(0, poss_dirs.Count)];
@@ -182,14 +203,14 @@ public class AIScript : MonoBehaviour
     private void ChangeMode(IEnumerable<Vector2> dirs)
     {
         bool found_hit = false;
-        foreach(var dir in dirs)
+        foreach (var dir in dirs)
         {
             RaycastHit2D hit;
-            if(my_type != AIType.evil) hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.51f), dir, 5.0f);
+            if (my_type != AIType.evil) hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.51f), dir, 5.0f);
             else hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y) + (dir * 0.71f), dir, 5.0f);
 
             if (!hit.collider) continue;
-            
+
             if (!hit.collider.CompareTag("Wall"))
             {
                 my_mode = CheckHit(hit, dir);
@@ -271,33 +292,25 @@ public class AIScript : MonoBehaviour
 
             if (hit.collider.CompareTag(chasing_tag))
             {
-                run_dir = dir;
                 return hit.transform.position;
             }
         }
 
-        Vector2 curr_maze_pos = CurrentNearestCell(GameObject.FindGameObjectWithTag(chasing_tag).transform.position);
-        Vector2 last_maze_pos = CurrentNearestCell(last_seen_pos);
-
-        if (last_maze_pos != curr_maze_pos)
-        {
-            IsChasing = false;
-            chasing_tag = null;
-        }
-        return curr_maze_pos;
+        return last_seen_pos;
     }
 
     private Vector2 CurrentNearestCell(Vector2 pos)
     {
         Vector2 res = gm.CalcMazePos(pos);
-        return new Vector2(Mathf.Round(res.x), Mathf.Round(res.y));
+        return res.Round();
     }
+    
     private Vector2 BFSPathFind(Vector2 start, Vector2 end)
     {
+        Debug.LogError("Start: " + start + "\nEnd: " + end);
         const int _max_distance = 10;
         Queue<KeyValuePair<MazeCellScript, int>> queue = new();
         bool[,] seen = new bool[21, 21];
-        Vector2 seen_offset = new(start.x - 10.0f, start.y - 10.0f);
         Vector2 start_plus_one = start;
 
         queue.Enqueue(new KeyValuePair<MazeCellScript, int>(gm.GetMazeCell(start), 0));
@@ -308,10 +321,12 @@ public class AIScript : MonoBehaviour
             var current = queue.Dequeue();
             MazeCellScript current_cell = current.Key;
             int current_distance = current.Value;
+            
+            Debug.LogError("Cell Dist: " + current_distance + "\nCell Pos: " + current_cell.transform.position);
 
             if (current_distance == 1)
             {
-                start_plus_one = gm.CalcMazePos(current_cell.transform.position);
+                start_plus_one = CurrentNearestCell(current_cell.transform.position);
             }
 
             if (current_cell == gm.GetMazeCell(end))
@@ -325,9 +340,10 @@ public class AIScript : MonoBehaviour
 
             foreach(var cell in cells)
             {
-                var pos = gm.CalcMazePos(cell.transform.position);
+                var pos = CurrentNearestCell(cell.transform.position);
 
-                var seen_pos = (pos - seen_offset);
+                var seen_pos = (pos - start).Add(10.0f);
+                Debug.LogError("Seen Position of this cell: " +  seen_pos);
 
                 if (!seen[(int)seen_pos.x, (int)seen_pos.y])
                 {
@@ -337,7 +353,7 @@ public class AIScript : MonoBehaviour
             }
         }
 
-        if (queue.Count == 0) Debug.LogError("PATHFIND ERROR: No Path Found");
+        if (queue.Count == 0) Debug.LogError("PATHFIND ERROR: No Path Found: " + start + " " + start_plus_one);
         else
         {
             return (start - start_plus_one);
