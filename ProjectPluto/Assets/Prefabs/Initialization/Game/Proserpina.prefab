@@ -352,7 +352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   move_speed: 1.85
-  run_speed: 2.5
+  run_speed: 3
   my_type: 1
   my_mode: 0
 --- !u!1 &7889610084844078316

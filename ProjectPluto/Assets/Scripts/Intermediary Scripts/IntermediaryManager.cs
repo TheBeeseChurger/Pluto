@@ -130,6 +130,8 @@ public class IntermediaryManager : MonoBehaviour
 
     public void KeyboardEnd()
     {
+        end_button.onClick.RemoveAllListeners();
+
         while (player_name.Length < 3)
         {
             player_name = " " + player_name;

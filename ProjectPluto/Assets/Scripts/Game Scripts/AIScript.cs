@@ -21,6 +21,20 @@ namespace Vec2ExtensionMethods
 
 public class AIScript : MonoBehaviour
 {
+    public class BFSNode
+    {
+        public MazeCellScript cell;
+        public BFSNode parent;
+        public int distance;
+
+        public BFSNode(MazeCellScript cell, int distance, BFSNode parent = null)
+        {
+            this.cell = cell;
+            this.distance = distance;
+            this.parent = parent;
+        }
+    }
+
     private int horizontal;
     private int vertical;
 
@@ -78,8 +92,15 @@ public class AIScript : MonoBehaviour
 
         if (IsChasing)
         {
-            last_seen_pos = CheckSight();
-            Debug.Log("Currently chasing. Last seen at: " + last_seen_pos);
+            var sight_check_pos = CheckSight();
+
+            if (sight_check_pos == last_seen_pos)
+            {
+                last_seen_pos = PredictPosition();
+            }
+            else last_seen_pos = sight_check_pos;
+
+            //Debug.Log("Currently chasing. Last seen at: " + last_seen_pos);
         }
 
         if (last_seen_pos != Vector2.zero) Debug.DrawLine(transform.position, last_seen_pos);
@@ -188,6 +209,11 @@ public class AIScript : MonoBehaviour
                 }
                 else
                 {
+                    if (poss_dirs.Contains(last_dir) && poss_dirs.Count > 1)
+                    {
+                        poss_dirs.Remove(last_dir);
+                    }
+
                     var rand_dir = poss_dirs[Random.Range(0, poss_dirs.Count)];
 
                     horizontal = (int)rand_dir.x;
@@ -280,6 +306,8 @@ public class AIScript : MonoBehaviour
 
     private Vector2 CheckSight()
     {
+        if (chasing_tag == null) return last_seen_pos;
+
         List<Vector2> poss_dirs = gm.PossibleDirections(transform.position);
 
         foreach (Vector2 dir in poss_dirs)
@@ -299,66 +327,79 @@ public class AIScript : MonoBehaviour
         return last_seen_pos;
     }
 
+    private Vector2 PredictPosition()
+    {
+        if (chasing_tag == null) return last_seen_pos;
+
+        Vector3 curr_pos = GameObject.FindGameObjectWithTag(chasing_tag).transform.position;
+
+        Vector2 last_cell = CurrentNearestCell(last_seen_pos);
+        Vector2 curr_cell = CurrentNearestCell(curr_pos);
+
+        if (last_cell != curr_cell)
+        {
+            chasing_tag = null;
+        }
+
+        return curr_pos;
+    }
+
     private Vector2 CurrentNearestCell(Vector2 pos)
     {
-        Vector2 res = gm.CalcMazePos(pos);
+        Vector2 res = gm.CalcMazePos(pos).Sub(0.5f);
         return res.Round();
     }
     
     private Vector2 BFSPathFind(Vector2 start, Vector2 end)
     {
-        Debug.LogError("Start: " + start + "\nEnd: " + end);
+        //Debug.LogError("Start: " + start + "\nEnd: " + end);
         const int _max_distance = 10;
-        Queue<KeyValuePair<MazeCellScript, int>> queue = new();
-        bool[,] seen = new bool[21, 21];
-        Vector2 start_plus_one = start;
+        Queue<BFSNode> queue = new();
+        HashSet<MazeCellScript> seen = new();
+        Vector2 start_plus_one;
 
-        queue.Enqueue(new KeyValuePair<MazeCellScript, int>(gm.GetMazeCell(start), 0));
-        seen[10, 10] = true;
+        queue.Enqueue(new BFSNode(gm.GetMazeCell(start), 0));
+        seen.Add(gm.GetMazeCell(start));
 
         while (queue.Count > 0)
         {
             var current = queue.Dequeue();
-            MazeCellScript current_cell = current.Key;
-            int current_distance = current.Value;
-            
-            Debug.LogError("Cell Dist: " + current_distance + "\nCell Pos: " + current_cell.transform.position);
-
-            if (current_distance == 1)
-            {
-                start_plus_one = CurrentNearestCell(current_cell.transform.position);
-            }
+            MazeCellScript current_cell = current.cell;
+            int current_distance = current.distance;
 
             if (current_cell == gm.GetMazeCell(end))
             {
-                break;
+                var path = ReconstructPath(current);
+                start_plus_one = CurrentNearestCell(path[1].transform.position);
+                //Debug.Log("Found path...\nHeading from: " + start + " to " + start_plus_one);
+                return start_plus_one - start;
             }
 
             if (current_distance >= _max_distance) continue;
 
-            var cells = gm.GetMazeConnectedCell(current_cell);
-
-            foreach(var cell in cells)
+            foreach(var cell in gm.GetMazeConnectedCell(current_cell))
             {
-                var pos = CurrentNearestCell(cell.transform.position);
-
-                var seen_pos = (pos - start).Add(10.0f);
-                Debug.LogError("Seen Position of this cell: " +  seen_pos);
-
-                if (!seen[(int)seen_pos.x, (int)seen_pos.y])
+                if (!seen.Contains(cell))
                 {
-                    seen[(int)seen_pos.x, (int)seen_pos.y] = true;
-                    queue.Enqueue(new KeyValuePair<MazeCellScript, int>(cell, current_distance + 1));
+                    seen.Add(cell);
+                    queue.Enqueue(new BFSNode(cell, current_distance + 1, current));
                 }
             }
         }
 
-        if (queue.Count == 0) Debug.LogError("PATHFIND ERROR: No Path Found: " + start + " " + start_plus_one);
-        else
-        {
-            return (start - start_plus_one);
-        }
-
+        Debug.LogError("PATHFIND ERROR: No Path Found: " + start + " " + end);
         return Vector2.zero;
+    }
+
+    private List<MazeCellScript> ReconstructPath(BFSNode node)
+    {
+        List<MazeCellScript> path = new();
+        while (node != null)
+        {
+            path.Add(node.cell);
+            node = node.parent;
+        }
+        path.Reverse();
+        return path;
     }
 }

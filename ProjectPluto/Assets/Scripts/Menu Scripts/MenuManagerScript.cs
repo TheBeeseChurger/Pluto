@@ -135,11 +135,16 @@ public class MenuManagerScript : MonoBehaviour
         _play.performed += Play;
     }
 
-    private void OnDisable()
+    private void DisableActions()
     {
         _cancel?.Disable();
         _mute?.Disable();
         _play?.Disable();
+    }
+
+    private void OnDisable()
+    {
+        DisableActions();
     }
 
     private void Cancel(InputAction.CallbackContext _context)
@@ -159,6 +164,7 @@ public class MenuManagerScript : MonoBehaviour
 
     private void Play(InputAction.CallbackContext _context)
     {
+        DisableActions();
         ProjectManager.MenuToIntermediary?.Invoke();
     }
 
