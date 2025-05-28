@@ -121,7 +121,6 @@ public class MazeCellScript : MonoBehaviour
         {
             case WallColor.red:
                 Color r_color = Color.red * percent;
-                r_color *= 0.5f;
                 r_color.a = 1;
                 l_wall.GetComponent<SpriteRenderer>().color = r_color;
                 r_wall.GetComponent<SpriteRenderer>().color = r_color;
@@ -130,7 +129,6 @@ public class MazeCellScript : MonoBehaviour
                 break;
             case WallColor.blue:
                 Color b_color = Color.blue * percent;
-                b_color *= 0.5f;
                 b_color.a = 1;
                 l_wall.GetComponent<SpriteRenderer>().color = b_color;
                 r_wall.GetComponent<SpriteRenderer>().color = b_color;

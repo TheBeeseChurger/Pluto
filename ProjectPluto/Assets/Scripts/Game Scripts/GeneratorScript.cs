@@ -24,6 +24,8 @@ public class GeneratorScript : MonoBehaviour
 
     [SerializeField] private GameObject[] landmarks;
 
+    private Degenerator degen;
+
     private enum NextCellFlags
     {
         Unvisited,
@@ -40,6 +42,9 @@ public class GeneratorScript : MonoBehaviour
 
         MazeGenerationStage3();
         //Debug.Log("Generation Stage 3: Done!");
+
+        MazeDegeneratorInit();
+        Debug.Log("Degenerator Initialized: Done!");
     }
 
     public MazeCellScript GetPlayer1Spawn()
@@ -270,6 +275,22 @@ public class GeneratorScript : MonoBehaviour
         }
 
         GenerateCell(null, maze_grid[0, 0]);
+    }
+
+    private void MazeDegeneratorInit()
+    {
+        degen = new Degenerator(cell_length, cell_width);
+
+        degen.ComputeChances();
+
+        for (int i = 0; i < cell_width; i++)
+        {
+            for (int j = 0;j < cell_length; j++)
+            {
+                var cell = maze_grid[i, j];
+                cell.PaintCell(MazeCellScript.WallColor.red, degen.GetChance(i, j) / degen.GetMaxChance());
+            }
+        }
     }
 
     private void SpawnLandmark(int x, int y)
@@ -581,5 +602,97 @@ public class GeneratorScript : MonoBehaviour
         }
 
         return MazeCellScript.WallType.Bottom;
+    }
+
+    private class Degenerator
+    {
+        private int grid_length;
+        private int grid_width;
+
+        private float[,] chances;
+        private bool[,] dead;
+        private readonly float min_distance = 10.0f;
+        private float max_chance = 0.0f;
+        
+        public Degenerator(int length, int width)
+        {
+            grid_length = length;
+            grid_width = width;
+
+            chances = new float[width, length];
+            dead = new bool[width, length];
+        }
+
+        // Compute values and normalize them
+        public void ComputeChances()
+        {
+            float center_x = (grid_width - 1) / 2;
+            float center_y = (grid_length - 1) / 2;
+
+            float total = 0.0f;
+
+            for (int x = 0; x < grid_width; x++)
+            {
+                for (int y = 0; y < grid_length; y++)
+                {
+                    float dx = x - center_x;
+                    float dy = y - center_y;
+                    float dist = Mathf.Sqrt(dx * dx + dy * dy);
+
+                    if (dist < min_distance)
+                        chances[x, y] = 0;
+                    else
+                    {
+                        chances[x, y] = dist - min_distance;
+                        total += chances[x, y];
+                    }
+                }
+            }
+
+            if (total > 0.0f)
+            {
+                for (int x = 0; x < grid_width; x++)
+                    for (int y = 0; y < grid_length; y++)
+                    {
+                        chances[x, y] /= total;
+
+                        if (chances[x, y] > max_chance)
+                            max_chance = chances[x, y];
+                    }
+            }
+        }
+
+        public float GetChance(int x, int y)
+        {
+            return chances[x, y];
+        }
+
+        public float GetMaxChance()
+        {
+            return max_chance;
+        }
+
+        public (int x, int y) GetRndTile()
+        {
+            float val = Random.Range(0.0f, 1.0f);
+            float cumul_val = 0.0f;
+
+            for (int x = 0; x < grid_width; x++)
+            {
+                for (int y = 0; y < grid_length; y++)
+                {
+                    cumul_val += chances[x, y];
+
+                    if (val <= cumul_val)
+                    {
+                        dead[x, y] = true;
+                        // Recalc
+                        return (x, y);
+                    }
+                }
+            }
+
+            throw new InvalidOperatorException("No tiles to select", typeof(float));
+        }
     }
 }
