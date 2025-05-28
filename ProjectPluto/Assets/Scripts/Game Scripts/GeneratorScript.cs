@@ -412,6 +412,11 @@ public class GeneratorScript : MonoBehaviour
         }
     }
 
+    public void PaintCell(MazeCellScript cell, MazeCellScript.WallColor color, float percent)
+    {
+        cell.PaintCell(color, percent);
+    }
+
     private MazeCellScript GetNextCell(MazeCellScript curr_cell, NextCellFlags flag = NextCellFlags.Unvisited)
     {
         IEnumerable<MazeCellScript> next_cells;

@@ -115,6 +115,31 @@ public class MazeCellScript : MonoBehaviour
         
     }
 
+    public void PaintCell(WallColor color, float percent = 1)
+    {
+        switch(color)
+        {
+            case WallColor.red:
+                Color r_color = Color.red * percent;
+                r_color *= 0.5f;
+                r_color.a = 1;
+                l_wall.GetComponent<SpriteRenderer>().color = r_color;
+                r_wall.GetComponent<SpriteRenderer>().color = r_color;
+                t_wall.GetComponent<SpriteRenderer>().color = r_color;
+                b_wall.GetComponent<SpriteRenderer>().color = r_color;
+                break;
+            case WallColor.blue:
+                Color b_color = Color.blue * percent;
+                b_color *= 0.5f;
+                b_color.a = 1;
+                l_wall.GetComponent<SpriteRenderer>().color = b_color;
+                r_wall.GetComponent<SpriteRenderer>().color = b_color;
+                t_wall.GetComponent<SpriteRenderer>().color = b_color;
+                b_wall.GetComponent<SpriteRenderer>().color = b_color;
+                break;
+        }
+    }
+
     public bool IsWallClr(WallType type)
     {
         return type switch
