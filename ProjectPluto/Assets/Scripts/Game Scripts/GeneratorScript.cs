@@ -239,6 +239,15 @@ public class GeneratorScript : MonoBehaviour
             var cell = maze_grid[randx, randy];
             var neighbor = GetNextCell(cell, NextCellFlags.Neighboring);
 
+            while (!HasWalls(cell, neighbor))
+            {
+                randx = Random.Range(0, cell_width);
+                randy = Random.Range(0, cell_length);
+
+                cell = maze_grid[randx, randy];
+                neighbor = GetNextCell(cell, NextCellFlags.Neighboring);
+            }
+
             ClrWalls(cell, neighbor);
         }
 
@@ -281,16 +290,31 @@ public class GeneratorScript : MonoBehaviour
     {
         degen = new Degenerator(cell_length, cell_width);
 
-        degen.ComputeChances();
+        degen.chances_modified += DisplayHeatMap;
 
+        degen.ComputeBaseChances();
+    }
+
+    private void DisplayHeatMap()
+    {
         for (int i = 0; i < cell_width; i++)
         {
-            for (int j = 0;j < cell_length; j++)
+            for (int j = 0; j < cell_length; j++)
             {
                 var cell = maze_grid[i, j];
-                cell.PaintCell(MazeCellScript.WallColor.red, degen.GetChance(i, j) / degen.GetMaxChance());
+                if (!degen.IsDead(i, j))
+                    cell.PaintCell(MazeCellScript.WallColor.red, degen.GetChance(i, j) / degen.GetMaxChance());
+                else
+                    cell.PaintCell(MazeCellScript.WallColor.blue);
             }
         }
+    }
+
+    public void DeleteRandomCell()
+    {
+        degen.GetRndTile();
+
+        //Delete
     }
 
     private void SpawnLandmark(int x, int y)
@@ -391,6 +415,40 @@ public class GeneratorScript : MonoBehaviour
             next_cell.ClrWall(MazeCellScript.WallType.Top);
             return;
         }
+    }
+
+    private bool HasWalls(MazeCellScript prev_cell, MazeCellScript next_cell)
+    {
+        if (prev_cell == null)
+        {
+            return true;
+        }
+
+        // Left to Right
+        if (prev_cell.transform.position.x < next_cell.transform.position.x)
+        {
+            return !prev_cell.IsWallClr(MazeCellScript.WallType.Right);
+        }
+
+        // Right to left
+        if (prev_cell.transform.position.x > next_cell.transform.position.x)
+        {
+            return !prev_cell.IsWallClr(MazeCellScript.WallType.Left);
+        }
+
+        // Bottom to Top
+        if (prev_cell.transform.position.y < next_cell.transform.position.y)
+        {
+            return !prev_cell.IsWallClr(MazeCellScript.WallType.Top);
+        }
+
+        // Top to Bottom
+        if (prev_cell.transform.position.y > next_cell.transform.position.y)
+        {
+            return !prev_cell.IsWallClr(MazeCellScript.WallType.Bottom);
+        }
+
+        throw new UnityException();
     }
 
     private void PaintWalls(MazeCellScript prev_cell, MazeCellScript next_cell, MazeCellScript.WallColor color)
@@ -609,67 +667,127 @@ public class GeneratorScript : MonoBehaviour
         private int grid_length;
         private int grid_width;
 
-        private float[,] chances;
+        private float[,] base_chances;
+        private float[,] modified_chances;
         private bool[,] dead;
+        private int dead_count;
+        private readonly int total_count;
         private readonly float min_distance = 10.0f;
+        private readonly float influence_radius = 5.0f;
         private float max_chance = 0.0f;
-        
+
+        public System.Action chances_modified;
+
         public Degenerator(int length, int width)
         {
             grid_length = length;
             grid_width = width;
 
-            chances = new float[width, length];
+            base_chances = new float[width, length];
+            modified_chances = new float[width, length];
             dead = new bool[width, length];
+
+            total_count = length * width;
         }
 
         // Compute values and normalize them
-        public void ComputeChances()
+        public void ComputeBaseChances()
         {
             float center_x = (grid_width - 1) / 2;
             float center_y = (grid_length - 1) / 2;
-
-            float total = 0.0f;
 
             for (int x = 0; x < grid_width; x++)
             {
                 for (int y = 0; y < grid_length; y++)
                 {
-                    float dx = x - center_x;
-                    float dy = y - center_y;
-                    float dist = Mathf.Sqrt(dx * dx + dy * dy);
+                    float dist = DistanceBetween(x - center_x, y - center_y);
 
                     if (dist < min_distance)
-                        chances[x, y] = 0;
+                        base_chances[x, y] = 0;
                     else
                     {
-                        chances[x, y] = dist - min_distance;
-                        total += chances[x, y];
+                        base_chances[x, y] = Mathf.Pow(dist - min_distance, 1.0f / 0.16f);
                     }
                 }
             }
+
+            UpdateModifiedMap();
+        }
+
+        public void UpdateModifiedMap()
+        {
+            float[,] temp = new float[grid_width, grid_length];
+            float total = 0.0f;
+            float prog_perc = 1 - (dead_count / total_count);
+
+            for (int x = 0; x < grid_width; x++)
+            {
+                for (int y = 0;y < grid_length; y++)
+                {
+                    if (dead[x, y])
+                    {
+                        temp[x, y] = 0.0f;
+                        continue;
+                    }
+
+                    float chance = base_chances[x, y];
+
+                    for (int x2 = 0; x2 < grid_width; x2++)
+                    {
+                        for (int y2 = 0; y2 < grid_length; y2++)
+                        {
+                            if (dead[x2, y2])
+                            {
+                                float dist = DistanceBetween(x - x2, y - y2);
+
+                                if (dist <= (prog_perc * (influence_radius - 1)) + 1 && dist > 0)
+                                {
+                                    chance += Mathf.Pow(dist, 0.16f);
+                                }
+                            }
+                        }
+                    }
+
+                    temp[x, y] = chance;
+                    total += chance;
+                }
+            }
+
+            max_chance = 0.0f;
 
             if (total > 0.0f)
             {
                 for (int x = 0; x < grid_width; x++)
                     for (int y = 0; y < grid_length; y++)
                     {
-                        chances[x, y] /= total;
+                        modified_chances[x, y] = temp[x, y] / total;
 
-                        if (chances[x, y] > max_chance)
-                            max_chance = chances[x, y];
+                        if (modified_chances[x, y] > max_chance)
+                            max_chance = modified_chances[x, y];
                     }
             }
+
+            chances_modified.Invoke();
         }
 
         public float GetChance(int x, int y)
         {
-            return chances[x, y];
+            return modified_chances[x, y];
+        }
+
+        public float GetBaseChance(int x, int y)
+        {
+            return base_chances[x, y];
         }
 
         public float GetMaxChance()
         {
             return max_chance;
+        }
+
+        public bool IsDead(int x, int y)
+        {
+            return dead[x, y];
         }
 
         public (int x, int y) GetRndTile()
@@ -681,18 +799,24 @@ public class GeneratorScript : MonoBehaviour
             {
                 for (int y = 0; y < grid_length; y++)
                 {
-                    cumul_val += chances[x, y];
+                    cumul_val += modified_chances[x, y];
 
                     if (val <= cumul_val)
                     {
                         dead[x, y] = true;
-                        // Recalc
+                        dead_count++;
+                        UpdateModifiedMap();
                         return (x, y);
                     }
                 }
             }
 
             throw new InvalidOperatorException("No tiles to select", typeof(float));
+        }
+
+        private float DistanceBetween(float change_x, float change_y)
+        {
+            return Mathf.Sqrt(change_x * change_x + change_y * change_y);
         }
     }
 }
