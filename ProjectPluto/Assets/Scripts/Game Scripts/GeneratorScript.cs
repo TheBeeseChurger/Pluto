@@ -44,7 +44,7 @@ public class GeneratorScript : MonoBehaviour
         //Debug.Log("Generation Stage 3: Done!");
 
         MazeDegeneratorInit();
-        Debug.Log("Degenerator Initialized: Done!");
+        //Debug.Log("Degenerator Initialized: Done!");
     }
 
     public MazeCellScript GetPlayer1Spawn()
@@ -742,7 +742,7 @@ public class GeneratorScript : MonoBehaviour
 
                                 if (dist <= (prog_perc * (influence_radius - 1)) + 1 && dist > 0)
                                 {
-                                    chance += Mathf.Pow(dist, 0.16f);
+                                    chance += Mathf.Pow(dist, 0.16f) * Mathf.Pow(dist, 0.2f);
                                 }
                             }
                         }
