@@ -73,6 +73,33 @@ public class MazeCellScript : MonoBehaviour
         }
     }
 
+    public void InvisWall(WallType type)
+    {
+        switch(type)
+        {
+            case WallType.Left:
+                l_wall.SetActive(true);
+                l_wall.GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f, 0f);
+                l_wall.GetComponent<BoxCollider2D>().enabled = false;
+                break;
+            case WallType.Right:
+                r_wall.SetActive(true);
+                r_wall.GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f, 0f);
+                r_wall.GetComponent<BoxCollider2D>().enabled = false;
+                break;
+            case WallType.Top:
+                t_wall.SetActive(true);
+                t_wall.GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f, 0f);
+                t_wall.GetComponent<BoxCollider2D>().enabled = false;
+                break;
+            case WallType.Bottom:
+                b_wall.SetActive(true);
+                b_wall.GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f, 0f);
+                b_wall.GetComponent<BoxCollider2D>().enabled = false;
+                break;
+        }
+    }
+
     public void PaintWall(WallType type, WallColor color)
     {
         switch(color)
@@ -148,6 +175,13 @@ public class MazeCellScript : MonoBehaviour
             WallType.Bottom => !b_wall.activeSelf,
             _ => false,
         };
+    }
+
+    public void Delete()
+    {
+        // Do stuff beforehand
+
+        Destroy(gameObject);
     }
 
     private IEnumerator CeilingReveal(float duration)

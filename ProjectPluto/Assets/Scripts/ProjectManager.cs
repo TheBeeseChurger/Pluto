@@ -50,6 +50,7 @@ public class ProjectManager : MonoBehaviour
         }
 
         await MenuSceneInit();
+        await MenuScenePreStart();
         await MenuSceneStart();
     }
 
@@ -67,11 +68,15 @@ public class ProjectManager : MonoBehaviour
         await SceneManager.UnloadSceneAsync(SCENE_CREDITS);
     }
 
-    private async Awaitable MenuSceneStart()
+    private async Awaitable MenuScenePreStart()
     {
         SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(SCENE_MENU));
         await _menu_manager_script.MenuPreStart(data, audio_head);
-        await Awaitable.NextFrameAsync();
+    }
+    private async Awaitable MenuSceneStart()
+    {
+        await Awaitable.MainThreadAsync();
+        await Awaitable.WaitForSecondsAsync(1f);
         _menu_manager_script.MenuStart();
     }
 
@@ -205,11 +210,11 @@ public class ProjectManager : MonoBehaviour
         SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(SCENE_GAME));
 
         await _loading_manager.FadeBlankSceneIn(true);
-        var _await = _loading_manager.PlayAnimation(true);
         await GameSceneClose();
         await MenuSceneInit();
         await Awaitable.WaitForSecondsAsync(2f);
-        await _await;
+        await _loading_manager.PlayAnimation(true);
+        await MenuScenePreStart();
         await _loading_manager.FadeBlankSceneOut(true);
         await MenuSceneStart();
     }

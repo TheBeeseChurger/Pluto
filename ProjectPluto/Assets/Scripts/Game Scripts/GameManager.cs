@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 
     private Timer score_timer;
     private Timer distance_timer;
+    private Timer degen_timer;
 
     private int last_distance;
 
@@ -140,6 +141,7 @@ public class GameManager : MonoBehaviour
 
         distance_timer.Interrupt();
         score_timer.Interrupt();
+        degen_timer.Interrupt();
 
         IsInitalizing = false;
         gameTimeScale = 1f;
@@ -164,6 +166,11 @@ public class GameManager : MonoBehaviour
 
         distance_timer.timer_spd = 1f;
         distance_timer.timer_time = 5f;
+
+        degen_timer = gameObject.AddComponent<Timer>();
+
+        degen_timer.timer_spd = 1f;
+        degen_timer.timer_time = 1f;
     }
 
     private void MazeInit()
@@ -220,15 +227,37 @@ public class GameManager : MonoBehaviour
             score -= 10;
         }
 
+        if (degen_timer.End)
+        {
+            (int x, int y) delete_pos = maze_gen.DeleteRandomCell();
+            var temp = CalcMazePos(player1.transform.position);
+            //temp -= new Vector2 (0.5f, 0.5f);
+            (int x, int y) p1_pos = (Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
+            temp = CalcMazePos(player2.transform.position);
+            temp -= new Vector2(0.5f, 0.5f);
+            (int x, int y) p2_pos = (Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
+            temp = CalcMazePos(evil.transform.position);
+            temp -= new Vector2(0.5f, 0.5f);
+            (int x, int y) ev_pos = (Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
+
+            if (p1_pos == delete_pos || p2_pos == delete_pos)
+            {
+                EndGame();
+            } else if (ev_pos == delete_pos)
+            {
+                Destroy(evil);
+            }
+        }
+
         if (distance_timer.End && gameTimeScale != 0f)
         {
             last_distance = maze_gen.GetCellDistance(CalcMazePos(player1.transform.position), CalcMazePos(player2.transform.position));
 
             //Debug.Log("Updated distance to " + last_distance);
 
-            if (last_distance < 3)
+            if (last_distance < 0)
             {
-                //NextRound();
+                EndGame();
             }
             else if (last_distance < 10)
             {
@@ -262,6 +291,12 @@ public class GameManager : MonoBehaviour
         {
             x_pos = (int)curr_pos.x;
             y_pos = (int)curr_pos.y;
+
+            if (maze_gen.GetCell(x_pos, y_pos) == null)
+            {
+                EndGame();
+                return;
+            }
 
             if (!maze_gen.GetCell(x_pos, y_pos).IsSeen)
             {

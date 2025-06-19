@@ -290,7 +290,7 @@ public class GeneratorScript : MonoBehaviour
     {
         degen = new Degenerator(cell_length, cell_width);
 
-        degen.chances_modified += DisplayHeatMap;
+        //degen.chances_modified += DisplayHeatMap;
 
         degen.ComputeBaseChances();
     }
@@ -310,11 +310,23 @@ public class GeneratorScript : MonoBehaviour
         }
     }
 
-    public void DeleteRandomCell()
+    public (int x, int y) DeleteRandomCell()
     {
-        degen.GetRndTile();
+        var pos = degen.GetRndTile();
 
-        //Delete
+        var cell = maze_grid[pos.x, pos.y];
+
+        var cells = GetConnectedCells(cell);
+
+        foreach (var new_cell in cells)
+        {
+            new_cell.InvisWall(GetDir(new_cell, cell));
+        }
+
+        cell.Delete();
+        maze_grid[pos.x, pos.y] = null;
+
+        return pos;
     }
 
     private void SpawnLandmark(int x, int y)
@@ -577,6 +589,8 @@ public class GeneratorScript : MonoBehaviour
         int x;
         int y;
 
+        if (curr_cell == null) yield break;
+
         if (!curr_cell.IsLandmarkCell)
         {
             x = (int)curr_cell.transform.localPosition.x;
@@ -672,7 +686,7 @@ public class GeneratorScript : MonoBehaviour
         private bool[,] dead;
         private int dead_count;
         private readonly int total_count;
-        private readonly float min_distance = 10.0f;
+        private readonly float distance_percent = 0.05f;
         private readonly float influence_radius = 5.0f;
         private float max_chance = 0.0f;
 
@@ -695,6 +709,8 @@ public class GeneratorScript : MonoBehaviour
         {
             float center_x = (grid_width - 1) / 2;
             float center_y = (grid_length - 1) / 2;
+
+            float min_distance = Mathf.Max(grid_length, grid_width) * distance_percent;
 
             for (int x = 0; x < grid_width; x++)
             {
@@ -767,7 +783,7 @@ public class GeneratorScript : MonoBehaviour
                     }
             }
 
-            chances_modified.Invoke();
+            chances_modified?.Invoke();
         }
 
         public float GetChance(int x, int y)
