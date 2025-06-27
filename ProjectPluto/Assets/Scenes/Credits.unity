@@ -2482,6 +2482,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07aa5472c4f1f1c4889eefadf0a70e1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  glitch_mat: {fileID: 2100000, guid: 0181d38406126e9448857ce6843b33b2, type: 2}
   credits:
   - head: {fileID: 381951915}
     cover_reference: {fileID: 649402969}

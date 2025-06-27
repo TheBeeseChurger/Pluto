@@ -5188,7 +5188,7 @@
     "m_Title": "Blue Channel",
     "m_Position": {
         "x": -2195.0,
-        "y": 2891.0
+        "y": 2890.999755859375
     }
 }
 
@@ -6742,7 +6742,7 @@
     "m_Title": "Green Channel",
     "m_Position": {
         "x": -2240.0,
-        "y": 1798.0
+        "y": 1797.9998779296875
     }
 }
 
@@ -10276,16 +10276,16 @@
     "m_RefNameGeneratedByDisplayName": "chrom_aberr_speed",
     "m_DefaultReferenceName": "_chrom_aberr_speed",
     "m_OverrideReferenceName": "",
-    "m_GeneratePropertyBlock": true,
+    "m_GeneratePropertyBlock": false,
     "m_UseCustomSlotLabel": false,
     "m_CustomSlotLabel": "",
     "m_DismissedVersion": 0,
     "m_Precision": 0,
-    "overrideHLSLDeclaration": false,
-    "hlslDeclarationOverride": 0,
+    "overrideHLSLDeclaration": true,
+    "hlslDeclarationOverride": 2,
     "m_Hidden": false,
-    "m_Value": 2.0,
-    "m_FloatType": 1,
+    "m_Value": 6.260000228881836,
+    "m_FloatType": 0,
     "m_RangeValues": {
         "x": 2.0,
         "y": 8.0
@@ -11521,7 +11521,7 @@
     "m_FloatType": 1,
     "m_RangeValues": {
         "x": 0.0,
-        "y": 0.03999999910593033
+        "y": 0.016599999740719796
     }
 }
 

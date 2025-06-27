@@ -5,6 +5,10 @@ using UnityEngine.Audio;
 
 public class OpeningScript : MonoBehaviour
 {
+    [Header("Glitch")]
+    [SerializeField] private Material glitch_mat;
+
+    [Header("Credits")]
     [SerializeField] private List<Credit> credits;
 
     [SerializeField] private float start_up_time;
@@ -28,6 +32,8 @@ public class OpeningScript : MonoBehaviour
 
         await Awaitable.WaitForSecondsAsync(start_up_time);
 
+        Invoke(nameof(GlitchEffect), 2f);
+
         foreach (var credit in credits)
         {
             credit.head.SetActive(true);
@@ -40,6 +46,15 @@ public class OpeningScript : MonoBehaviour
 
             await Awaitable.WaitForSecondsAsync(time_between_credits);
         }
+        glitch_mat.SetFloat("_chrom_aberr_offset_max", 0f);
+    }
+
+    private async void GlitchEffect()
+    {
+        glitch_mat.SetFloat("_chrom_aberr_offset_max", 0.0166f);
+        await Awaitable.WaitForSecondsAsync(UnityEngine.Random.Range(0.2f, 1.0f));
+        glitch_mat.SetFloat("_chrom_aberr_offset_max", 0f);
+        Invoke(nameof(GlitchEffect), UnityEngine.Random.Range(0.5f, 1.5f));
     }
 
     private async Awaitable FadeIn(Credit credit, float time)

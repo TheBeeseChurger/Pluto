@@ -9,6 +9,9 @@ public class LoadingManager : MonoBehaviour
     public LoadingTip[] loading_tips;
     private LoadingTip current_tip;
 
+    [SerializeField] private Material glitch_mat;
+    private bool is_glitching;
+
     [SerializeField] private TextMeshProUGUI random_text;
     [SerializeField] private SpriteRenderer random_sprite;
 
@@ -101,6 +104,8 @@ public class LoadingManager : MonoBehaviour
 
     public async Awaitable FadeSceneOut(bool audio_change = false)
     {
+        is_glitching = false;
+
         float curr_time = 0f;
         while (scene_alpha.alpha > 0f)
         {
@@ -138,6 +143,9 @@ public class LoadingManager : MonoBehaviour
             await Awaitable.NextFrameAsync();
             curr_time += Time.deltaTime;
         }
+
+        is_glitching = true;
+        Invoke(nameof(GlitchEffect), Random.Range(0.5f, 1f));
     }
 
     private void SceneReset()
@@ -213,5 +221,15 @@ public class LoadingManager : MonoBehaviour
     private void PickNewLoadingTip()
     {
         current_tip = loading_tips[Random.Range(0, loading_tips.Length)];
+    }
+
+    private async void GlitchEffect()
+    {
+        glitch_mat.SetFloat("_chrom_aberr_offset_max", 0.0166f);
+        await Awaitable.WaitForSecondsAsync(Random.Range(0.2f, 0.6f));
+        glitch_mat.SetFloat("_chrom_aberr_offset_max", 0f);
+
+        if (is_glitching)
+            Invoke(nameof(GlitchEffect), Random.Range(1.5f, 3.0f));
     }
 }

@@ -29,6 +29,10 @@ public class GameManager : MonoBehaviour
     AudioSource song;
     AudioSource ui;
 
+    [Header("Glitch")]
+    [SerializeField] Material glitch_mat;
+    List<GameObject> glitchers;
+
     [Header("AudioResource")]
     [SerializeField] AudioResource bgm;
 
@@ -124,6 +128,7 @@ public class GameManager : MonoBehaviour
         MazeInit();
         SeeInit();
         TimerInit();
+        GlitchInit();
 
         tracer.CamReset();
 
@@ -213,6 +218,14 @@ public class GameManager : MonoBehaviour
                 SeeAndScore(cell);
             }
         }
+    }
+
+    private void GlitchInit()
+    {
+        glitchers = new List<GameObject>()
+        {
+            evil
+        };
     }
 
     void Update()
@@ -315,6 +328,7 @@ public class GameManager : MonoBehaviour
         }
 
         CompassControl();
+        GlitchControl();
     }
 
     public void EndGame()
@@ -468,5 +482,26 @@ public class GameManager : MonoBehaviour
 
         p2compass_hand.transform.rotation = Quaternion.RotateTowards(p2compass_hand.transform.rotation, q_ang1, diff_spd1 * Time.deltaTime);
         evcompass_hand.transform.rotation = Quaternion.RotateTowards(evcompass_hand.transform.rotation, q_ang2, diff_spd2 * Time.deltaTime);
+    }
+
+    private void GlitchControl()
+    {
+        float val = 0f;
+        foreach (GameObject glitch in glitchers)
+        {
+            var g_dist = (glitch.transform.position - player1.transform.position).magnitude;
+
+            if (g_dist > 5f)
+            {
+                Debug.Log("Outside Range.");
+                continue;
+            }
+            float m_val = (1f / 8f) * Mathf.Pow(g_dist - 5f, 2f) * 0.0105f;
+            Debug.Log("Distance is " + g_dist + "\nVal should be " + m_val);
+            if (val < m_val)
+                val = m_val;
+        }
+        Debug.Log("Val is " + val);
+        glitch_mat.SetFloat("_chrom_aberr_offset_max", val);
     }
 }

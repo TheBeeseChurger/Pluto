@@ -150,10 +150,11 @@ public class MenuManagerScript : MonoBehaviour
     private void Cancel(InputAction.CallbackContext _context)
     {
         ui.resource = quit;
-        ui.time = 5f;
+        ui.time = 5.1f;
         ui.Play();
 
         FindFirstObjectByType<Animator>().Play("Close");
+        song.Stop();
         Invoke(nameof(EndGame), 1.0f);
     }
 
