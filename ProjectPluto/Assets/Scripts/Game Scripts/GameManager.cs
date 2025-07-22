@@ -150,6 +150,7 @@ public class GameManager : MonoBehaviour
 
         IsInitalizing = false;
         gameTimeScale = 1f;
+        glitch_mat.SetFloat("_chrom_aberr", 1f);
     }
 
     private void Init()
@@ -327,12 +328,16 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        if (gameTimeScale == 0f) return;
+
         CompassControl();
         GlitchControl();
     }
 
     public void EndGame()
     {
+        glitch_mat.SetFloat("_chrom_aberr", 0f);
+        glitch_mat.SetFloat("_chrom_aberr_offset_max", 0f);
         gameTimeScale = 0f;
 
         data.AddScore(score);
@@ -347,6 +352,8 @@ public class GameManager : MonoBehaviour
 
     public void NextRound()
     {
+        glitch_mat.SetFloat("_chrom_aberr", 0f);
+        glitch_mat.SetFloat("_chrom_aberr_offset_max", 0f);
         gameTimeScale = 0f;
 
         score += (int)(500 * score_multiplier);
@@ -491,17 +498,50 @@ public class GameManager : MonoBehaviour
         {
             var g_dist = (glitch.transform.position - player1.transform.position).magnitude;
 
-            if (g_dist > 5f)
-            {
-                Debug.Log("Outside Range.");
-                continue;
-            }
+            if (g_dist > 5f) continue;
+
             float m_val = (1f / 8f) * Mathf.Pow(g_dist - 5f, 2f) * 0.0105f;
-            Debug.Log("Distance is " + g_dist + "\nVal should be " + m_val);
             if (val < m_val)
                 val = m_val;
         }
-        Debug.Log("Val is " + val);
         glitch_mat.SetFloat("_chrom_aberr_offset_max", val);
     }
+
+    private struct SightSystem
+    {
+        Dictionary<MazeCellScript, int> seen_maze;
+        GeneratorScript gen;
+        
+        private void See(MazeCellScript location)
+        {
+            if (seen_maze.ContainsKey(location))
+            {
+                if (seen_maze[location] == 11)
+                    return;
+                seen_maze[location] = 11;
+            } else
+            {
+                seen_maze.Add(location, 11);
+            }
+                
+
+            
+        }
+
+        private void Reveal(MazeCellScript location, int vision_level)
+        {
+
+        }
+
+        private float VisionToFloat(int vision_level)
+        {
+            if (vision_level > 11)
+                return -1f;
+            if (vision_level > 9)
+                if (vision_level > 7)
+                    if (vision_level > 5)
+                        if (vision_level > 3)
+
+        }
+    };
 }

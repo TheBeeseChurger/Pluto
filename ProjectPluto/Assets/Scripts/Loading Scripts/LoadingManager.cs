@@ -104,6 +104,7 @@ public class LoadingManager : MonoBehaviour
 
     public async Awaitable FadeSceneOut(bool audio_change = false)
     {
+        if (glitch_mat.GetFloat("_chrom_aberr") != 0f) glitch_mat.SetFloat("_chrom_aberr", 0f);
         is_glitching = false;
 
         float curr_time = 0f;
@@ -145,6 +146,7 @@ public class LoadingManager : MonoBehaviour
         }
 
         is_glitching = true;
+        if (glitch_mat.GetFloat("_chrom_aberr") != 1f) glitch_mat.SetFloat("_chrom_aberr", 1f);
         Invoke(nameof(GlitchEffect), Random.Range(0.5f, 1f));
     }
 

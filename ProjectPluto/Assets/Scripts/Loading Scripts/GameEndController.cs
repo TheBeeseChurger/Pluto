@@ -17,11 +17,13 @@ public class GameEndController : MonoBehaviour
 
     public void PlayRoundEnd()
     {
+        Destroy(_game_over.gameObject);
         _round_end.Play("Round Change");
     }
 
     public void PlayGameOver()
     {
+        Destroy(_round_end.gameObject);
         _game_over.Play("Game Over");
     }
 }

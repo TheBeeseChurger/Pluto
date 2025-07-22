@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6842250399080449349}
   - component: {fileID: 3005452643937708921}
+  - component: {fileID: 8275370067741398606}
   m_Layer: 0
   m_Name: GameOverScreen
   m_TagString: Untagged
@@ -55,6 +56,21 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8275370067741398606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228547495005717722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 351ba1e6219dec44ca3d825cdcca3c8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  is_glitching: 0
+  offset_glitch: 0.0166
+  glitch: {fileID: 2100000, guid: 0181d38406126e9448857ce6843b33b2, type: 2}
 --- !u!1 &382526632845845193
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,6 +353,7 @@ GameObject:
   m_Component:
   - component: {fileID: 234148201551168972}
   - component: {fileID: 7713318716972317318}
+  - component: {fileID: 8610216931833772981}
   m_Layer: 0
   m_Name: RoundScreen
   m_TagString: Untagged
@@ -382,6 +399,21 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8610216931833772981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3919530129316213762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 351ba1e6219dec44ca3d825cdcca3c8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  is_glitching: 0
+  offset_glitch: 0.0166
+  glitch: {fileID: 2100000, guid: 0181d38406126e9448857ce6843b33b2, type: 2}
 --- !u!1 &4122877454058701204
 GameObject:
   m_ObjectHideFlags: 0
