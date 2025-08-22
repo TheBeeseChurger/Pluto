@@ -30,18 +30,18 @@ public class MazeCellScript : MonoBehaviour
         blue
     }
 
-    public void See(float percent_fade = 0.0f)
+    public void See(float percent_fade)
     {
         if (!IsSeen)
         {
-            StartCoroutine(CeilingReveal(0.5f, percent_fade));
+            StopAllCoroutines();
+            StartCoroutine(CeilingReveal(0.6f, percent_fade));
             if (percent_fade > 0.0f ) return;
             if (IsLandmarkCell)
             {
-                GetComponentInParent<LandmarkCellScript>().See();
+                GetComponentInParent<LandmarkCellScript>().See(percent_fade);
             }
             IsSeen = true;
-            
         }
     }
 
@@ -188,17 +188,23 @@ public class MazeCellScript : MonoBehaviour
     private IEnumerator CeilingReveal(float duration, float end_amt)
     {
         Color color = ceiling.color;
-        float time = 0;
-        float start = color.a;
+        float time = 0f;
+        float start_amt = color.a;
 
         while (time < duration)
         {
-            color = new Color(color.r, color.g, color.b, Mathf.Lerp(start, end_amt, time / duration));
-
             time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / duration);
+            
+            color.a = Mathf.Lerp(start_amt, end_amt, t);
+            ceiling.color = color;
 
             yield return null;
         }
-        ceiling.enabled = false;
+
+        color.a = end_amt;
+        ceiling.color = color;
+
+        if (Mathf.Approximately(color.a, 0.0f)) ceiling.enabled = false;
     }
 }

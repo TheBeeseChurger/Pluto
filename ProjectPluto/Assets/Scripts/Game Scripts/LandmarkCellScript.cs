@@ -14,16 +14,16 @@ public class LandmarkCellScript : MonoBehaviour
 
     public bool IsSeen { get; private set; }
 
-    public void See()
+    public void See(float percent_fade)
     {
         if (!IsSeen)
         {
             IsSeen = true;
 
-            cell_bl.See();
-            cell_br.See();
-            cell_tl.See();
-            cell_tr.See();
+            cell_bl.See(percent_fade);
+            cell_br.See(percent_fade);
+            cell_tl.See(percent_fade);
+            cell_tr.See(percent_fade);
         }
     }
 

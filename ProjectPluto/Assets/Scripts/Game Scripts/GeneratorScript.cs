@@ -429,7 +429,7 @@ public class GeneratorScript : MonoBehaviour
         }
     }
 
-    private bool HasWalls(MazeCellScript prev_cell, MazeCellScript next_cell)
+    public bool HasWalls(MazeCellScript prev_cell, MazeCellScript next_cell)
     {
         if (prev_cell == null)
         {
@@ -558,7 +558,7 @@ public class GeneratorScript : MonoBehaviour
         }
     }
 
-    private IEnumerable<MazeCellScript> GetNeighboringCells(MazeCellScript curr_cell)
+    public IEnumerable<MazeCellScript> GetNeighboringCells(MazeCellScript curr_cell)
     {
         int x = (int)curr_cell.transform.localPosition.x;
         int y = (int)curr_cell.transform.localPosition.y;
@@ -658,7 +658,7 @@ public class GeneratorScript : MonoBehaviour
         list.Add(curr_cell);
     }
 
-    private MazeCellScript.WallType GetDir(MazeCellScript prev_cell, MazeCellScript curr_cell)
+    public MazeCellScript.WallType GetDir(MazeCellScript prev_cell, MazeCellScript curr_cell)
     {
         if (prev_cell.transform.position.x < curr_cell.transform.position.x)
         {

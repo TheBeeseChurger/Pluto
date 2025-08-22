@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -10,6 +13,8 @@ public class GameManager : MonoBehaviour
     public static int round = 0;
 
     private InputSystem_Actions _input_system;
+
+    private SightSystem _sight_system;
 
     private Timer score_timer;
     private Timer distance_timer;
@@ -51,6 +56,8 @@ public class GameManager : MonoBehaviour
     GameObject player2;
     GameObject evil;
 
+    Vector2 last_evil_pos;
+
     RoundTriggerScript[] player2_triggers;
 
     GameObject p2compass_hand;
@@ -85,6 +92,8 @@ public class GameManager : MonoBehaviour
         await Awaitable.MainThreadAsync();
         await InstantiateAsync(_maze);
         maze_gen = FindFirstObjectByType<GeneratorScript>();
+
+        _sight_system = new(maze_gen);
 
         await InstantiateAsync(_follower);
         follower = FindFirstObjectByType<CameraFollowScript>();
@@ -201,24 +210,7 @@ public class GameManager : MonoBehaviour
         x_pos = (int)start_pos.x;
         y_pos = (int)start_pos.y;
 
-        if (!maze_gen.GetCell(x_pos, y_pos).IsLandmarkCell)
-        {
-            maze_gen.GetCell(x_pos, y_pos).See();
-        }
-        else
-        {
-            maze_gen.GetCell(x_pos, y_pos).GetComponentInParent<LandmarkCellScript>().See();
-        }
-
-        List<MazeCellScript> cells = maze_gen.GetStraightConnectedCells(maze_gen.GetCell(x_pos, y_pos));
-
-        foreach (var cell in cells)
-        {
-            if (!cell.IsSeen)
-            {
-                SeeAndScore(cell);
-            }
-        }
+        _sight_system.See(maze_gen.GetCell(x_pos, y_pos));
     }
 
     private void GlitchInit()
@@ -250,17 +242,27 @@ public class GameManager : MonoBehaviour
             temp = CalcMazePos(player2.transform.position);
             temp -= new Vector2(0.5f, 0.5f);
             (int x, int y) p2_pos = (Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
-            temp = CalcMazePos(evil.transform.position);
-            temp -= new Vector2(0.5f, 0.5f);
-            (int x, int y) ev_pos = (Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
 
             if (p1_pos == delete_pos || p2_pos == delete_pos)
             {
                 EndGame();
-            } else if (ev_pos == delete_pos)
-            {
-                Destroy(evil);
             }
+
+            if (evil != null)
+            {
+                temp = CalcMazePos(evil.transform.position);
+                temp -= new Vector2(0.5f, 0.5f);
+                (int x, int y) ev_pos = (Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
+                
+                if (ev_pos == delete_pos)
+                {
+                    last_evil_pos = new(ev_pos.x, ev_pos.y);
+                    glitchers.Remove(evil);
+                    Destroy(evil);
+                }
+            }
+
+             
         }
 
         if (distance_timer.End && gameTimeScale != 0f)
@@ -311,20 +313,9 @@ public class GameManager : MonoBehaviour
                 EndGame();
                 return;
             }
-
-            if (!maze_gen.GetCell(x_pos, y_pos).IsSeen)
+            else if (!_sight_system.IsSeen(maze_gen.GetCell(x_pos, y_pos)))
             {
-                SeeAndScore(maze_gen.GetCell(x_pos, y_pos));
-            }
-
-            List<MazeCellScript> cells = maze_gen.GetStraightConnectedCells(maze_gen.GetCell(x_pos, y_pos));
-
-            foreach (var cell in cells)
-            {
-                if (!cell.IsSeen)
-                {
-                    SeeAndScore(cell);
-                }
+                _sight_system.See(maze_gen.GetCell(x_pos, y_pos));
             }
         }
 
@@ -432,26 +423,12 @@ public class GameManager : MonoBehaviour
         round = 0;
     }
 
-    private void SeeAndScore(MazeCellScript cell)
-    {
-        cell.See();
-
-        if (cell.IsLandmarkCell)
-        {
-            score += (int)(100 * score_multiplier);
-        }
-        else
-        {
-            score += (int)(10 * score_multiplier);
-        }
-    }
-
     private void CompassControl()
     {
         var dist1 = player2.transform.position - player1.transform.position;
-        var dist2 = evil.transform.position - player1.transform.position;
+        var dist2 = evil == null ? evil.transform.position - player1.transform.position : new Vector3(last_evil_pos.x, last_evil_pos.y) - player1.transform.position;
 
-        if (compass_jammer || (dist1.magnitude < 5f || dist2.magnitude < 5f))
+        if (compass_jammer || dist1.magnitude < 5f || (dist2.magnitude < 5f && evil != null))
         {
             if (pro_compass_rand_dir == 0f)
             {
@@ -511,37 +488,158 @@ public class GameManager : MonoBehaviour
     {
         Dictionary<MazeCellScript, int> seen_maze;
         GeneratorScript gen;
-        
-        private void See(MazeCellScript location)
-        {
-            if (seen_maze.ContainsKey(location))
-            {
-                if (seen_maze[location] == 11)
-                    return;
-                seen_maze[location] = 11;
-            } else
-            {
-                seen_maze.Add(location, 11);
-            }
-                
 
-            
+        struct cellData
+        {
+            public int dist;
+            public Vector2 dir;
+
+            public cellData(int dist, Vector2 dir)
+            {
+                this.dist = dist;
+                this.dir = dir;
+            }
+        }
+        
+        public SightSystem(GeneratorScript gen)
+        {
+            this.gen = gen;
+            seen_maze = new();
+        }
+
+        public bool IsSeen(MazeCellScript location)
+        {
+            if (!seen_maze.ContainsKey(location)) return false;
+
+            return seen_maze[location] == 11;
+        }
+
+        public async void See(MazeCellScript location)
+        {
+            seen_maze[location] = 11;
+            Reveal(location, 11);
+
+            Queue<KeyValuePair<MazeCellScript, cellData>> queue = new();
+
+            queue.Enqueue(new KeyValuePair<MazeCellScript, cellData>(location, new cellData(0, Vector2.zero)));
+
+            while (queue.Count > 0)
+            {
+                if (gameTimeScale <= 0) return;
+
+                //Debug.Log("New Cell");
+                var current = queue.Dequeue();
+                MazeCellScript curr_cell = current.Key;
+                cellData curr_data = current.Value;
+                int curr_v_level = seen_maze[curr_cell];
+
+                if (curr_v_level == 11)
+                {
+                    //Debug.Log("A Cell has perfect vision.");
+                    var next_cells = gen.GetNeighboringCells(curr_cell);
+
+                    foreach (var cell in next_cells)
+                    {
+                        if (cell == null) continue;
+
+                        if (seen_maze.ContainsKey(cell))
+                            if (seen_maze[cell] == 11) continue;
+
+                        if (gen.HasWalls(curr_cell, cell))
+                        {
+                            if (!seen_maze.ContainsKey(cell)) seen_maze[cell] = 2;
+                            else if (seen_maze[cell] < 2) seen_maze[cell] = 2;
+                            else continue;
+                        }
+                        else
+                        {
+                            if (!seen_maze.ContainsKey(cell)) seen_maze[cell] = curr_v_level - 1;
+                            else if (seen_maze[cell] < curr_v_level - 1) seen_maze[cell] = curr_v_level - 1;
+                            else continue;
+                        }
+
+                        cellData data = new(curr_data.dist++, GetCellDir(curr_cell, cell));
+                        Reveal(cell, seen_maze[cell]);
+                        queue.Enqueue(new KeyValuePair<MazeCellScript, cellData>(cell, data));
+                    }
+                }
+                else if (curr_v_level > 1)
+                {
+                    var next_cells = gen.GetConnectedCells(curr_cell);
+
+                    foreach (var cell in next_cells)
+                    {
+                        if (cell == null) continue;
+
+                        if (GetCellDir(curr_cell, cell) == curr_data.dir)
+                            if (!seen_maze.ContainsKey(cell)) seen_maze[cell] = curr_v_level - 1;
+                            else if (seen_maze[cell] < curr_v_level - 1) seen_maze[cell] = curr_v_level - 1;
+                            else continue;
+                        else
+                            if (!seen_maze.ContainsKey(cell)) seen_maze[cell] = curr_v_level - 2;
+                            else if (seen_maze[cell] < curr_v_level - 2) seen_maze[cell] = curr_v_level - 2;
+                            else continue;
+
+                        cellData data = new(curr_data.dist++, GetCellDir(curr_cell, cell));
+                        Reveal(cell, seen_maze[cell]);
+                        queue.Enqueue(new KeyValuePair<MazeCellScript, cellData>(cell, data));
+                    }
+                }
+                await Awaitable.NextFrameAsync();
+            }
         }
 
         private void Reveal(MazeCellScript location, int vision_level)
         {
+            //Debug.Log("Vision level of cell: " + vision_level);
+            location.See(VisionToFloat(vision_level));
 
+            if (vision_level > 8) Score(location);
+        }
+
+        private void Score(MazeCellScript location)
+        {
+            if (location.IsLandmarkCell)
+            {
+                score += (int)(100 * score_multiplier);
+            }
+            else
+            {
+                score += (int)(10 * score_multiplier);
+            }
         }
 
         private float VisionToFloat(int vision_level)
         {
-            if (vision_level > 11)
-                return -1f;
-            if (vision_level > 9)
-                if (vision_level > 7)
-                    if (vision_level > 5)
-                        if (vision_level > 3)
+            if (vision_level > 7)
+                return 0.0f;
+            else if (vision_level > 5)
+                return 0.25f;
+            else if (vision_level > 3)
+                return 0.5f;
+            else if (vision_level > 2)
+                return 0.75f;
+            else 
+                return 1.0f;
+        }
 
+        private Vector2 GetCellDir(MazeCellScript prev_cell, MazeCellScript next_cell)
+        {
+            var type = gen.GetDir(prev_cell, next_cell);
+
+            switch (type)
+            {
+                case MazeCellScript.WallType.Left:
+                    return Vector2.left;
+                case MazeCellScript.WallType.Right:
+                    return Vector2.right;
+                case MazeCellScript.WallType.Top:
+                    return Vector2.up;
+                case MazeCellScript.WallType.Bottom:
+                    return Vector2.down;
+                default:
+                    return Vector2.zero;
+            }
         }
     };
 }
