@@ -145,8 +145,6 @@ public class GameManager : MonoBehaviour
     {
         tracer.TraceStart();
 
-        SeeStart();
-
         player1.GetComponent<PlayerScript>().PlayerStart();
         player2.GetComponent<AIScript>().AIStart();
         evil.GetComponent<AIScript>().AIStart();
@@ -158,6 +156,8 @@ public class GameManager : MonoBehaviour
         IsInitalizing = false;
         gameTimeScale = 1f;
         glitch_mat.SetFloat("_chrom_aberr", 1f);
+
+        SeeStart();
     }
 
     private void Init()
@@ -425,7 +425,10 @@ public class GameManager : MonoBehaviour
     private void CompassControl()
     {
         var dist1 = player2.transform.position - player1.transform.position;
-        var dist2 = evil == null ? evil.transform.position - player1.transform.position : new Vector3(last_evil_pos.x, last_evil_pos.y) - player1.transform.position;
+        var dist2 = new Vector3(last_evil_pos.x, last_evil_pos.y) - player1.transform.position;
+
+        if (evil != null)
+            dist2 = evil.transform.position - player1.transform.position;
 
         if (compass_jammer || dist1.magnitude < 5f || (dist2.magnitude < 5f && evil != null))
         {
@@ -515,7 +518,7 @@ public class GameManager : MonoBehaviour
 
         public async void See(MazeCellScript location)
         {
-            Debug.Log("Starting See Algo");
+            //Debug.Log("Starting See Algo");
 
             seen_maze[location] = 11;
             Reveal(location, 11);
