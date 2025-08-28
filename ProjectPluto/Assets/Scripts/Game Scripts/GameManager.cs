@@ -1,8 +1,5 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -135,7 +132,6 @@ public class GameManager : MonoBehaviour
         }
 
         MazeInit();
-        SeeInit();
         TimerInit();
         GlitchInit();
 
@@ -148,6 +144,8 @@ public class GameManager : MonoBehaviour
     public void GameStart()
     {
         tracer.TraceStart();
+
+        SeeStart();
 
         player1.GetComponent<PlayerScript>().PlayerStart();
         player2.GetComponent<AIScript>().AIStart();
@@ -203,7 +201,7 @@ public class GameManager : MonoBehaviour
         last_distance = maze_gen.GetCellDistance(p1_cell, p2_cell);
     }
 
-    private void SeeInit()
+    private void SeeStart()
     {
         var start_pos = CalcMazePos(player1.transform.position);
 
@@ -349,6 +347,7 @@ public class GameManager : MonoBehaviour
 
         score += (int)(500 * score_multiplier);
         score_multiplier += 0.5f;
+
 
         ProjectManager.GameToGame.Invoke();
     }
@@ -516,6 +515,8 @@ public class GameManager : MonoBehaviour
 
         public async void See(MazeCellScript location)
         {
+            Debug.Log("Starting See Algo");
+
             seen_maze[location] = 11;
             Reveal(location, 11);
 
