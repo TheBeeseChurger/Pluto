@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class CameraTraceScript : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class CameraTraceScript : MonoBehaviour
     readonly Vector3 cam_default = new(0f, 0f, -10f);
 
     bool IsInitializing = true;
+    bool IsOver = false;
+
+    Vector3 end_pos;
 
     public void Init()
     {
@@ -26,11 +30,11 @@ public class CameraTraceScript : MonoBehaviour
         IsInitializing = false;
     }
 
-    public void TraceStop()
+    public void TraceStop(Vector3 end_pos)
     {
-        IsInitializing = true;
+        IsOver = true;
 
-        cam.transform.localPosition = cam_default;
+        this.end_pos = end_pos;
     }
 
 
@@ -38,29 +42,47 @@ public class CameraTraceScript : MonoBehaviour
     {
         if (IsInitializing) return;
 
-        var dist = Vector2.Distance(transform.position, player.transform.position);
+        if (!IsOver)
+        {
+            CamTrace(player.transform.position);
+            return;
+        }
 
-        dist *= move_speed;
+        CamTrace(end_pos);
+    }
+
+    private void CamTrace(Vector3 position)
+    {
+        var dist = Vector2.Distance(transform.position, position);
 
         if (dist > max_dist)
         {
-            dist *= 1.2f;
+            dist = max_dist;
         }
-        else if (dist > max_speed)
+
+        dist *= move_speed;
+
+        if (dist > max_speed)
         {
             dist = max_speed;
         }
 
-        var new_vec2 = Vector2.MoveTowards(transform.position, player.transform.position, dist);
+        var new_vec2 = Vector2.MoveTowards(transform.position, position, dist);
 
-        transform.position = new Vector3((new_vec2.x) * GameManager.gameTimeScale, (new_vec2.y) * GameManager.gameTimeScale, -1f);
+        transform.position = new Vector3((new_vec2.x), (new_vec2.y), -1f);
 
-        cam.transform.position = new Vector3((new_vec2.x) * GameManager.gameTimeScale, (new_vec2.y) * GameManager.gameTimeScale, -10f);
+        cam.transform.position = new Vector3((new_vec2.x), (new_vec2.y), -10f);
     }
 
     public void CamReset()
     {
         transform.position = new Vector3(player.transform.position.x, player.transform.position.y, transform.position.z);
         cam.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, cam.transform.position.z);
+    }
+
+    public void CamToOrigin()
+    {
+        transform.position = new Vector3(0, 0, transform.position.z);
+        cam.transform.position = new Vector3(0, 0, cam.transform.position.z);
     }
 }

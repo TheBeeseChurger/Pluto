@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Analytics;
 using UnityEngine.Audio;
 
 public class GameManager : MonoBehaviour
@@ -323,8 +324,11 @@ public class GameManager : MonoBehaviour
         GlitchControl();
     }
 
-    public void EndGame()
+    public async void EndGame(Vector2 end_pos = new Vector2())
     {
+        if (new Vector2() == end_pos) 
+            end_pos = player1.transform.position;
+
         glitch_mat.SetFloat("_chrom_aberr", 0f);
         glitch_mat.SetFloat("_chrom_aberr_offset_max", 0f);
         gameTimeScale = 0f;
@@ -333,10 +337,18 @@ public class GameManager : MonoBehaviour
         data.CommitScore();
         ResetScore();
 
-        tracer.TraceStop();
+        _sight_system.AbsSee(end_pos);
+        tracer.TraceStop(end_pos);
 
+        song.Stop();
+        await Awaitable.WaitForSecondsAsync(3f);
         ProjectManager.GameToMenu.Invoke();
         //END GAME
+    }
+
+    public void ResetGame()
+    {
+        tracer.CamToOrigin();
     }
 
     public void NextRound()
@@ -593,12 +605,30 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        private void Reveal(MazeCellScript location, int vision_level)
+        public void AbsSee(Vector2 see_pos)
+        {
+            Vector2Int vec = new Vector2Int(Mathf.RoundToInt(see_pos.x - gen.transform.position.x + 0.5f), Mathf.RoundToInt(see_pos.y - gen.transform.position.y + 0.5f));
+
+            for (int i = -10; i <= 10; i++)
+            {
+                for (int j = -10; j <= 10; j++)
+                {
+                    if (!gen.CheckCell(vec.x + i, vec.y + j)) continue;
+                    var cell = gen.GetCell(vec.x + i, vec.y + j);
+
+                    if (cell == null) continue;
+                    Reveal(cell, 11, false);
+                }
+            }
+        }
+
+        private void Reveal(MazeCellScript location, int vision_level, bool score = true)
         {
             //Debug.Log("Vision level of cell: " + vision_level);
-            location.See(VisionToFloat(vision_level));
+            if (location.IsLandmarkCell) location.GetComponentInParent<LandmarkCellScript>().See(VisionToFloat(vision_level));
+            else location.See(VisionToFloat(vision_level));
 
-            if (vision_level > 8) Score(location);
+            if (vision_level > 8 && score) Score(location);
         }
 
         private void Score(MazeCellScript location)

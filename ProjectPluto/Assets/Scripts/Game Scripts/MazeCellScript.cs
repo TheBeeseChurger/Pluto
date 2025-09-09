@@ -34,13 +34,17 @@ public class MazeCellScript : MonoBehaviour
     {
         if (!IsSeen)
         {
+            if (IsLandmarkCell)
+            {
+                if (percent_fade <= 0)
+                    IsSeen = true;
+
+                return;
+            }
+
             StopAllCoroutines();
             StartCoroutine(CeilingReveal(0.6f, percent_fade));
             if (percent_fade > 0.0f ) return;
-            if (IsLandmarkCell)
-            {
-                GetComponentInParent<LandmarkCellScript>().See(percent_fade);
-            }
             IsSeen = true;
         }
     }

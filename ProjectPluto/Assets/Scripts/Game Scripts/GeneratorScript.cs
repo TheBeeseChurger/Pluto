@@ -67,6 +67,13 @@ public class GeneratorScript : MonoBehaviour
         return maze_grid[x, y];
     }
 
+    public bool CheckCell(int x, int y)
+    {
+        if (x < 0 || y < 0) return false;
+        if (x >= cell_width || y >= cell_length) return false;
+        return true;
+    }
+
     public Vector2 CellMazePos(MazeCellScript cell)
     {
         int x;
@@ -530,8 +537,11 @@ public class GeneratorScript : MonoBehaviour
 
     private IEnumerable<MazeCellScript> GetUnvisitedCells(MazeCellScript curr_cell)
     {
-        int x = (int)curr_cell.transform.localPosition.x;
-        int y = (int)curr_cell.transform.localPosition.y;
+        if (curr_cell == null) yield break;
+
+        Vector2 vec = CellMazePos(curr_cell);
+        int x = (int)vec.x;
+        int y = (int)vec.y;
 
         if (x + 1 < cell_width)
         {
@@ -560,8 +570,11 @@ public class GeneratorScript : MonoBehaviour
 
     public IEnumerable<MazeCellScript> GetNeighboringCells(MazeCellScript curr_cell)
     {
-        int x = (int)curr_cell.transform.localPosition.x;
-        int y = (int)curr_cell.transform.localPosition.y;
+        if (curr_cell == null) yield break;
+
+        Vector2 vec = CellMazePos(curr_cell);
+        int x = (int)vec.x;
+        int y = (int)vec.y;
 
         if (x + 1 < cell_width)
         {
@@ -586,21 +599,11 @@ public class GeneratorScript : MonoBehaviour
 
     public IEnumerable<MazeCellScript> GetConnectedCells(MazeCellScript curr_cell)
     {
-        int x;
-        int y;
-
         if (curr_cell == null) yield break;
 
-        if (!curr_cell.IsLandmarkCell)
-        {
-            x = (int)curr_cell.transform.localPosition.x;
-            y = (int)curr_cell.transform.localPosition.y;
-        }
-        else
-        {
-            x = (int)(curr_cell.transform.parent.localPosition.x + curr_cell.transform.localPosition.x);
-            y = (int)(curr_cell.transform.parent.localPosition.y + curr_cell.transform.localPosition.y);
-        }
+        Vector2 vec = CellMazePos(curr_cell);
+        int x = (int)vec.x;
+        int y = (int)vec.y;
 
         if (curr_cell.IsWallClr(MazeCellScript.WallType.Right) && x + 1 < cell_width)
         {

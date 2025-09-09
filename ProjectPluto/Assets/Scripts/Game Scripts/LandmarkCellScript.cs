@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class LandmarkCellScript : MonoBehaviour
@@ -6,6 +7,9 @@ public class LandmarkCellScript : MonoBehaviour
     [SerializeField] MazeCellScript cell_br;
     [SerializeField] MazeCellScript cell_tl;
     [SerializeField] MazeCellScript cell_tr;
+
+    [SerializeField] SpriteRenderer ceiling;
+    public float curr_alpha = 1f;
 
     private GeneratorScript maze;
 
@@ -16,15 +20,19 @@ public class LandmarkCellScript : MonoBehaviour
 
     public void See(float percent_fade)
     {
-        if (!IsSeen)
-        {
-            IsSeen = true;
+        if (IsSeen) return;
 
-            cell_bl.See(percent_fade);
-            cell_br.See(percent_fade);
-            cell_tl.See(percent_fade);
-            cell_tr.See(percent_fade);
-        }
+        if (percent_fade <= 0) IsSeen = true;
+
+        curr_alpha = percent_fade;
+
+        StopAllCoroutines();
+        StartCoroutine(CeilingReveal(0.6f, percent_fade));
+
+        cell_bl.See(percent_fade);
+        cell_br.See(percent_fade);
+        cell_tl.See(percent_fade);
+        cell_tr.See(percent_fade);
     }
 
     public void Initialize(GeneratorScript new_maze)
@@ -82,5 +90,28 @@ public class LandmarkCellScript : MonoBehaviour
             clonecell.Lock();
         }
 
+    }
+
+    private IEnumerator CeilingReveal(float duration, float end_amt)
+    {
+        Color color = ceiling.color;
+        float time = 0f;
+        float start_amt = color.a;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / duration);
+
+            color.a = Mathf.Lerp(start_amt, end_amt, t);
+            ceiling.color = color;
+
+            yield return null;
+        }
+
+        color.a = end_amt;
+        ceiling.color = color;
+
+        if (Mathf.Approximately(color.a, 0.0f)) ceiling.enabled = false;
     }
 }

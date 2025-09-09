@@ -471,6 +471,8 @@ MonoBehaviour:
   cell_br: {fileID: 434415934375988802}
   cell_tl: {fileID: 3336696255093687631}
   cell_tr: {fileID: 6769893192162405557}
+  ceiling: {fileID: 7820359286283154415}
+  curr_alpha: 1
 --- !u!4 &3107949625669276440 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1203495111087679037, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
