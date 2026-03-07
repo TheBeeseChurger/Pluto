@@ -143,7 +143,7 @@ public class ProjectManager : MonoBehaviour
 
     private async Awaitable GameSceneClose()
     {
-        _game_manager.ResetGame();
+        await _game_manager.ResetGame();
         _game_manager = null;
 
         await SceneManager.UnloadSceneAsync(SCENE_GAME);

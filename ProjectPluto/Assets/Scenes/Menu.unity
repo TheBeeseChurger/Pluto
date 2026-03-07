@@ -209,10 +209,7 @@ MonoBehaviour:
   quit: {fileID: 8300000, guid: 4524d27f6658a034d95e5dd8056d1263, type: 3}
   bgm: {fileID: 8300000, guid: 62e98a73ab71c0744b30661320489a40, type: 3}
   _canvas: {fileID: 8374849266971287575, guid: 7c177c2436bdfe447af9b8d53e3aeadd, type: 3}
-  _indicator_script: {fileID: 0}
-  _score_manager_script: {fileID: 0}
-  _blink_text_script: {fileID: 0}
-  prefab: {fileID: 5263041022784550400, guid: 34fa533add4908d4cb56775ce1dcc9c9, type: 3}
+  anim_intro: {fileID: 5263041022784550400, guid: 34fa533add4908d4cb56775ce1dcc9c9, type: 3}
 --- !u!4 &1844634405
 Transform:
   m_ObjectHideFlags: 0

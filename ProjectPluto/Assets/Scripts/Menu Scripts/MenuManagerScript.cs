@@ -32,7 +32,7 @@ public class MenuManagerScript : MonoBehaviour
     BlinkTextScript _blink_text_script;
 
     [Header("Intro Animation")]
-    [SerializeField] GameObject prefab;
+    [SerializeField] GameObject anim_intro;
 
     private bool IsInitializing = true;
 
@@ -51,7 +51,7 @@ public class MenuManagerScript : MonoBehaviour
 
         Init();
 
-        await InstantiateAsync(prefab);
+        await InstantiateAsync(anim_intro);
         await InstantiateAsync(_canvas);
         _indicator_script = FindAnyObjectByType<IndicatorScript>();
 
@@ -73,7 +73,7 @@ public class MenuManagerScript : MonoBehaviour
 
         song.resource = bgm;
         song.loop = true;
-        song.Play();
+        song.PlayDelayed(5.0f);
 
         GameManager.gameTimeScale = 1f;
         
