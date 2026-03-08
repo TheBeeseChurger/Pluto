@@ -35,14 +35,15 @@ public class OpeningScript : MonoBehaviour
     public async Awaitable RunCredits(GameObject new_audio)
     {
         audio_head = new_audio;
-        ambience = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
-        song = audio_head.transform.GetChild(1).GetComponent<AudioSource>();
+        song = audio_head.transform.GetChild(0).GetComponent<AudioSource>();
+        ambience = audio_head.transform.GetChild(1).GetComponent<AudioSource>();
 
         ambience.resource = pre_start;
         ambience.volume = 0.5f;
         ambience.Play();
 
-        song.volume = 0.15f;
+        song.volume = 0.10f;
+        song.loop = false;
 
 
         await Awaitable.WaitForSecondsAsync(start_up_time);

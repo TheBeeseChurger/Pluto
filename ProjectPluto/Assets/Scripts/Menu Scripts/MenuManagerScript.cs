@@ -78,6 +78,7 @@ public class MenuManagerScript : MonoBehaviour
         _score_manager_script.Start();
 
         song.resource = bgm;
+        song.volume = 0.8f;
         song.loop = true;
         song.PlayDelayed(5.0f);
 
