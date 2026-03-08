@@ -11,6 +11,8 @@ TagManager:
   - Wall
   - Input
   - End
+  - Del
+  - Controls
   layers:
   - Default
   - TransparentFX

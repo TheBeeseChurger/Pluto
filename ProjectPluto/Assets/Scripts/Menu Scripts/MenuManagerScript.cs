@@ -10,6 +10,9 @@ public class MenuManagerScript : MonoBehaviour
     InputAction _cancel;
     InputAction _mute;
     InputAction _play;
+    InputAction _controls;
+
+    GameObject controls_menu;
 
     [SerializeField] float time;
 
@@ -65,6 +68,9 @@ public class MenuManagerScript : MonoBehaviour
         _blink_text_script = FindAnyObjectByType<BlinkTextScript>();
 
         _blink_text_script.Init();
+
+        controls_menu = GameObject.FindGameObjectWithTag("Controls");
+        controls_menu.SetActive(false);
     }
 
     public void MenuStart()
@@ -133,6 +139,11 @@ public class MenuManagerScript : MonoBehaviour
         _play.Enable();
 
         _play.performed += Play;
+
+        _controls = _input_system.UI.Controls;
+        _controls.Enable();
+
+        _controls.performed += Controls;
     }
 
     private void DisableActions()
@@ -140,6 +151,7 @@ public class MenuManagerScript : MonoBehaviour
         _cancel?.Disable();
         _mute?.Disable();
         _play?.Disable();
+        _controls?.Disable();
     }
 
     private void OnDisable()
@@ -172,6 +184,11 @@ public class MenuManagerScript : MonoBehaviour
     public void ToggleSong()
     {
         song.mute = !song.mute;
+    }
+
+    private void Controls(InputAction.CallbackContext _context)
+    {
+        controls_menu.SetActive(!controls_menu.activeSelf);
     }
 
     private void EndGame()
