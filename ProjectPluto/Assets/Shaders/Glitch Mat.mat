@@ -68,7 +68,7 @@ Material:
     - _UIMaskSoftnessY: 1
     - _ZWrite: 0
     - _chrom_aberr: 1
-    - _chrom_aberr_offset_max: 0.00034298314
+    - _chrom_aberr_offset_max: 0
     - _chrom_aberr_speed: 6.26
     - _chrom_aberr_threshold: 0.039
     - _flicker_strength: 0.427

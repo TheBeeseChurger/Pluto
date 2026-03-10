@@ -229,7 +229,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   glitch_mat: {fileID: 2100000, guid: 0181d38406126e9448857ce6843b33b2, type: 2}
   bgm: {fileID: 8300000, guid: 94b9e685e520ae04fb4ee69ff760e08a, type: 3}
-  call: {fileID: 8300000, guid: ee8b7ded009a8bc4990b386e39131ca7, type: 3}
+  call:
+  - {fileID: 8300000, guid: ee8b7ded009a8bc4990b386e39131ca7, type: 3}
   _maze: {fileID: 8148194801723818400, guid: 574bc6f58f01e4442867ac9f8cdb108d, type: 3}
   _tracer: {fileID: 8989008563346564959, guid: e5c0de3db1cfe9a4282d879f02eac9ff, type: 3}
   _follower: {fileID: 2862958448213499177, guid: 49568165dbcc29b4bbd7788d8bf80115, type: 3}

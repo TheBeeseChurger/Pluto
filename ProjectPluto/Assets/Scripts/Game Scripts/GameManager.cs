@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
 
     [Header("AudioResource")]
     [SerializeField] AudioResource bgm;
-    [SerializeField] AudioResource call;
+    [SerializeField] AudioResource[] call;
 
     [Header("Initialization References")]
     [SerializeField] GameObject _maze;
@@ -315,7 +315,7 @@ public class GameManager : MonoBehaviour
 
                 call_indicator.TurnOn();
 
-                ui.resource = call;
+                ui.resource = call[Random.Range(0, call.Length)];
                 ui.loop = false;
                 ui.volume = 0.4f;
                 ui.Play();
