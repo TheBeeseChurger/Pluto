@@ -17,13 +17,12 @@ public class GameManager : MonoBehaviour
     private Timer score_timer;
     private Timer distance_timer;
     private Timer degen_timer;
+    private Timer call_timer;
 
     private int last_distance;
 
     private int x_pos;
     private int y_pos;
-
-    private bool compass_jammer = false;
 
     static DataScript data;
 
@@ -38,6 +37,7 @@ public class GameManager : MonoBehaviour
 
     [Header("AudioResource")]
     [SerializeField] AudioResource bgm;
+    [SerializeField] AudioResource call;
 
     [Header("Initialization References")]
     [SerializeField] GameObject _maze;
@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour
     GeneratorScript maze_gen;
     CameraTraceScript tracer;
     CameraFollowScript follower;
+    CallIndicatorScript call_indicator;
     GameObject player1;
     GameObject player2;
     GameObject evil;
@@ -57,12 +58,6 @@ public class GameManager : MonoBehaviour
     Vector2 last_evil_pos;
 
     RoundTriggerScript[] player2_triggers;
-
-    GameObject p2compass_hand;
-    GameObject evcompass_hand;
-
-    float pro_compass_rand_dir = 0f;
-    float evil_compass_rand_dir = 0f;
 
     TextMeshProUGUI score_text;
     TextMeshProUGUI multiplier_text;
@@ -96,8 +91,6 @@ public class GameManager : MonoBehaviour
         await InstantiateAsync(_follower);
         follower = FindFirstObjectByType<CameraFollowScript>();
         follower.Init();
-        p2compass_hand = GameObject.Find("ProserpinaHand");
-        evcompass_hand = GameObject.Find("CeresHand");
         score_text = GameObject.Find("ScoreText").GetComponent<TextMeshProUGUI>();
         multiplier_text = GameObject.Find("MultiplierText").GetComponent<TextMeshProUGUI>();
         round_text = GameObject.Find("RoundText").GetComponent<TextMeshProUGUI>();
@@ -114,6 +107,9 @@ public class GameManager : MonoBehaviour
         player2 = GameObject.FindGameObjectWithTag("Player2");
         player2.GetComponent<AIScript>().Init(this);
         player2_triggers = FindObjectsByType<RoundTriggerScript>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+
+        call_indicator = FindFirstObjectByType<CallIndicatorScript>();
+        call_indicator.Init(player1.transform, player2.transform);
 
         foreach (var trigger in player2_triggers)
         {
@@ -185,6 +181,11 @@ public class GameManager : MonoBehaviour
 
         degen_timer.timer_spd = 1f;
         degen_timer.timer_time = 1f;
+
+        call_timer = gameObject.AddComponent<Timer>();
+
+        call_timer.timer_spd = 1f;
+        call_timer.timer_time = 5f;
     }
 
     private void MazeInit()
@@ -242,9 +243,13 @@ public class GameManager : MonoBehaviour
             temp -= new Vector2(0.5f, 0.5f);
             (int x, int y) p2_pos = (Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
 
-            if (p1_pos == delete_pos || p2_pos == delete_pos)
+            if (p1_pos == delete_pos)
             {
-                EndGame();
+                EndGame(player1.transform.position);
+            } 
+            if (p2_pos == delete_pos)
+            {
+                EndGame(player2.transform.position);
             }
 
             if (evil != null)
@@ -272,7 +277,8 @@ public class GameManager : MonoBehaviour
 
             if (last_distance < 0)
             {
-                EndGame();
+                //No Path Found
+                EndGame(player2.transform.position);
             }
             else if (last_distance < 10)
             {
@@ -300,6 +306,29 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        if (call_timer.End)
+        {
+            if (call_timer.timer_time > 2f)
+            {
+                call_timer.timer_time = 2f;
+                call_timer.Interrupt();
+
+                call_indicator.TurnOn();
+
+                ui.resource = call;
+                ui.loop = false;
+                ui.volume = 0.4f;
+                ui.Play();
+            }
+            else
+            {
+                call_timer.timer_time = 10f + Random.Range(0f, 10f);
+                call_timer.Interrupt();
+
+                call_indicator.TurnOff();
+            }
+        }
+
         var curr_pos = CalcMazePos(player1.transform.position);
 
         if (x_pos != (int)curr_pos.x || y_pos != (int)curr_pos.y)
@@ -320,7 +349,6 @@ public class GameManager : MonoBehaviour
 
         if (gameTimeScale == 0f) return;
 
-        CompassControl();
         GlitchControl();
     }
 
@@ -342,13 +370,22 @@ public class GameManager : MonoBehaviour
 
         song.Stop();
         await Awaitable.WaitForSecondsAsync(3f);
-        ProjectManager.GameToMenu.Invoke();
+
+        if (round >= 25)
+        {
+            //Transfer to secret cutscene
+        } else
+        {
+            ProjectManager.GameToMenu.Invoke();
+        }
         //END GAME
     }
 
-    public void ResetGame()
+    public async Awaitable ResetGame()
     {
         tracer.CamToOrigin();
+
+        await Awaitable.NextFrameAsync();
     }
 
     public void NextRound()
@@ -434,54 +471,6 @@ public class GameManager : MonoBehaviour
         round = 0;
     }
 
-    private void CompassControl()
-    {
-        var dist1 = player2.transform.position - player1.transform.position;
-        var dist2 = new Vector3(last_evil_pos.x, last_evil_pos.y) - player1.transform.position;
-
-        if (evil != null)
-            dist2 = evil.transform.position - player1.transform.position;
-
-        if (compass_jammer || dist1.magnitude < 5f || (dist2.magnitude < 5f && evil != null))
-        {
-            if (pro_compass_rand_dir == 0f)
-            {
-                pro_compass_rand_dir = 300f * Random.Range(0.5f, 1.5f);
-            }
-
-            if (evil_compass_rand_dir == 0)
-            {
-                evil_compass_rand_dir = 300f * Random.Range(0.5f, 1.5f);
-            }
-
-            Quaternion quat1 = Quaternion.Euler(0f, 0f, pro_compass_rand_dir * Time.deltaTime);
-            Quaternion quat2 = Quaternion.Euler(0f, 0f, evil_compass_rand_dir * Time.deltaTime);
-
-            p2compass_hand.transform.rotation *= quat1;
-            evcompass_hand.transform.rotation *= quat2;
-
-            return;
-        }
-
-        pro_compass_rand_dir = 0f;
-        evil_compass_rand_dir = 0f;
-
-        var dir1 = (dist1).normalized;
-        var dir2 = (dist2).normalized;
-
-        float angle1 = Vector2.SignedAngle(Vector2.up, dir1);
-        float angle2 = Vector2.SignedAngle(Vector2.up, dir2);
-
-        Quaternion q_ang1 = Quaternion.Euler(0f, 0f, angle1);
-        Quaternion q_ang2 = Quaternion.Euler(0f, 0f, angle2);
-
-        var diff_spd1 = Mathf.Abs(p2compass_hand.transform.rotation.eulerAngles.z - angle1);
-        var diff_spd2 = Mathf.Abs(evcompass_hand.transform.rotation.eulerAngles.z - angle2);
-
-        p2compass_hand.transform.rotation = Quaternion.RotateTowards(p2compass_hand.transform.rotation, q_ang1, diff_spd1 * Time.deltaTime);
-        evcompass_hand.transform.rotation = Quaternion.RotateTowards(evcompass_hand.transform.rotation, q_ang2, diff_spd2 * Time.deltaTime);
-    }
-
     private void GlitchControl()
     {
         float val = 0f;
@@ -496,6 +485,44 @@ public class GameManager : MonoBehaviour
                 val = m_val;
         }
         glitch_mat.SetFloat("_chrom_aberr_offset_max", val);
+    }
+
+    public void FireReveal(MazeCellScript bl_cell, int radius)
+    {
+        Vector2Int bl_int = new Vector2Int((int)bl_cell.transform.localPosition.x, (int)bl_cell.transform.localPosition.y);
+
+        for (int dx = 0; dx < 2; dx++)
+        {
+            for (int dy = 0; dy < 2; dy++)
+            {
+                _sight_system.OneSee(maze_gen.GetCell(bl_int.x + dx, bl_int.y + dy));
+            }
+        }
+
+        for (int r = 1; r < radius; r++)
+        {
+            for(int x = -r - 1; x <= r + 1; x++)
+            {
+                for (int y = -r - 1; y <= r + 1; y++)
+                {
+
+                }
+            }
+        }
+    }
+
+    private int DistFromCen(Vector2Int cell, Vector2Int cen)
+    {
+        int minX = cen.x;
+        int minY = cen.y;
+        int maxX = cen.x + 1;
+        int maxY = cen.y + 1;
+
+        int clampedX = Mathf.Clamp(cell.x, minX, maxX);
+        int clampedY = Mathf.Clamp(cell.y, minY, maxY);
+
+        Vector2Int closestPoint = new Vector2Int(clampedX, clampedY);
+        return (cell - closestPoint).sqrMagnitude;
     }
 
     private struct SightSystem
@@ -603,6 +630,14 @@ public class GameManager : MonoBehaviour
                 }
                 await Awaitable.NextFrameAsync();
             }
+        }
+
+        public void OneSee(MazeCellScript location)
+        {
+            if (location == null) return;
+            if (seen_maze[location] == 11) return;
+            seen_maze[location] = 11;
+            Reveal(location, seen_maze[location]);
         }
 
         public void AbsSee(Vector2 see_pos)

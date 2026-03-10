@@ -5,6 +5,8 @@ public class RoundTriggerScript : MonoBehaviour
     Collider2D blocker;
     GameManager gameManager;
 
+    bool hit = false;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (blocker) return;
@@ -14,7 +16,11 @@ public class RoundTriggerScript : MonoBehaviour
             blocker = other;
         } else
         {
-            gameManager.NextRound();
+            if (!hit)
+            {
+                hit = true;
+                PlayerHit();
+            }
         }
     }
 
@@ -27,8 +33,21 @@ public class RoundTriggerScript : MonoBehaviour
             blocker = other;
         } else
         {
-            gameManager.NextRound();
+            if (!hit)
+            {
+                hit = true;
+                PlayerHit();
+            }
         }
+    }
+
+    private async void PlayerHit()
+    {
+        await Awaitable.EndOfFrameAsync();
+
+        if (blocker) return;
+
+        gameManager.NextRound();
     }
 
     private void OnTriggerExit2D(Collider2D other)

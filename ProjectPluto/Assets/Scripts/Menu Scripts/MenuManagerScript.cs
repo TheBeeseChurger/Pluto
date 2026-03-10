@@ -80,15 +80,16 @@ public class MenuManagerScript : MonoBehaviour
         song.resource = bgm;
         song.volume = 0.8f;
         song.loop = true;
-        song.PlayDelayed(5.0f);
 
         GameManager.gameTimeScale = 1f;
         
         if (game_start == 1)
         {
+            song.PlayDelayed(5.0f);
             FindAnyObjectByType<Animator>().Play("Open");
         } else
         {
+            song.Play();
             FindAnyObjectByType<Animator>().Play("Screen Fade");
         }
             
