@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -14,6 +15,13 @@ public class MazeCellScript : MonoBehaviour
 
     [Header("Ceiling")]
     [SerializeField] private SpriteRenderer ceiling;
+    [SerializeField] private Sprite[] ceiling_cracked;
+
+    [Header("Floor")]
+    [SerializeField] private SpriteRenderer floor;
+    [SerializeField] private Sprite[] floor_cracked;
+
+    public event Action<MazeCellScript, int, int> OnDeleted;
 
     public bool IsSeen { get; private set; }
     public bool IsVisited { get; private set; }
@@ -182,10 +190,29 @@ public class MazeCellScript : MonoBehaviour
         };
     }
 
-    public void Delete()
+    public async Awaitable Delete(int x, int y)
     {
-        // Do stuff beforehand
+        if (IsLandmarkCell)
+        {
+            OnDeleted?.Invoke(this, x, y);
+            return;
+        }
 
+        int rand = UnityEngine.Random.Range(0, floor_cracked.Length);
+
+        floor.sprite = floor_cracked[rand];
+        ceiling.sprite = ceiling_cracked[rand];
+
+        try
+        {
+            await Awaitable.WaitForSecondsAsync(2f, destroyCancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        OnDeleted?.Invoke(this, x, y);
         Destroy(gameObject);
     }
 

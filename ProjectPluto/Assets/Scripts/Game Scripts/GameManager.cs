@@ -179,7 +179,7 @@ public class GameManager : MonoBehaviour
 
         degen_timer = gameObject.AddComponent<Timer>();
 
-        degen_timer.timer_spd = 1f;
+        degen_timer.timer_spd = 2f;
         degen_timer.timer_time = 1f;
 
         call_timer = gameObject.AddComponent<Timer>();
@@ -235,37 +235,7 @@ public class GameManager : MonoBehaviour
 
         if (degen_timer.End)
         {
-            (int x, int y) delete_pos = maze_gen.DeleteRandomCell();
-            var temp = CalcMazePos(player1.transform.position);
-            //temp -= new Vector2 (0.5f, 0.5f);
-            (int x, int y) p1_pos = (Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
-            temp = CalcMazePos(player2.transform.position);
-            temp -= new Vector2(0.5f, 0.5f);
-            (int x, int y) p2_pos = (Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
-
-            if (p1_pos == delete_pos)
-            {
-                EndGame(player1.transform.position);
-            } 
-            if (p2_pos == delete_pos)
-            {
-                EndGame(player2.transform.position);
-            }
-
-            if (evil != null)
-            {
-                temp = CalcMazePos(evil.transform.position);
-                temp -= new Vector2(0.5f, 0.5f);
-                (int x, int y) ev_pos = (Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
-                
-                if (ev_pos == delete_pos)
-                {
-                    last_evil_pos = new(ev_pos.x, ev_pos.y);
-                    glitchers.Remove(evil);
-                    Destroy(evil);
-                }
-            }
-
+            maze_gen.DeleteRandomCell();
              
         }
 

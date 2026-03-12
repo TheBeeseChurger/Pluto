@@ -143,6 +143,15 @@ MonoBehaviour:
   t_wall: {fileID: 9152875519898856892}
   b_wall: {fileID: 6561528755354219123}
   ceiling: {fileID: 6275049803311875786}
+  ceiling_cracked:
+  - {fileID: 21300000, guid: 541ef92095c1a384aa6d9b0807550b66, type: 3}
+  - {fileID: 21300000, guid: 844deef159a98d848bb9adab9dac9a34, type: 3}
+  - {fileID: 21300000, guid: a4fc7f6c6e86f324091f0cb6c64d1589, type: 3}
+  floor: {fileID: 1263763517771015822}
+  floor_cracked:
+  - {fileID: 21300000, guid: 541ef92095c1a384aa6d9b0807550b66, type: 3}
+  - {fileID: 21300000, guid: 844deef159a98d848bb9adab9dac9a34, type: 3}
+  - {fileID: 21300000, guid: a4fc7f6c6e86f324091f0cb6c64d1589, type: 3}
 --- !u!1 &6136077759156270242
 GameObject:
   m_ObjectHideFlags: 0

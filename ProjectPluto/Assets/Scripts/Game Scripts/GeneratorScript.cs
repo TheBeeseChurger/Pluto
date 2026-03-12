@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class GeneratorScript : MonoBehaviour
 {
@@ -317,23 +318,56 @@ public class GeneratorScript : MonoBehaviour
         }
     }
 
-    public (int x, int y) DeleteRandomCell()
+    public void DeleteRandomCell()
     {
         var pos = degen.GetRndTile();
 
         var cell = maze_grid[pos.x, pos.y];
 
-        var cells = GetConnectedCells(cell);
-
-        foreach (var new_cell in cells)
+        if (cell.IsLandmarkCell)
         {
-            new_cell.InvisWall(GetDir(new_cell, cell));
+            LandmarkCellScript landmark = cell.GetComponentInParent<LandmarkCellScript>();
+
+
+            KeyValuePair<MazeCellScript, (int, int)>[] cells = new KeyValuePair<MazeCellScript, (int, int)>[4];
+            cells[0] = new KeyValuePair<MazeCellScript, (int, int)>(landmark.GetCell(1, 1), (0, 0));
+            cells[1] = new KeyValuePair<MazeCellScript, (int, int)>(landmark.GetCell(1, 2), (0, 1));
+            cells[2] = new KeyValuePair<MazeCellScript, (int, int)>(landmark.GetCell(2, 1), (1, 0));
+            cells[3] = new KeyValuePair<MazeCellScript, (int, int)>(landmark.GetCell(2, 2), (1, 1));
+
+            foreach (var landmark_cell in cells)
+            {
+                landmark_cell.Key.OnDeleted += CellDeleted;
+                degen.RemoveTile(landmark_cell.Value.Item1, landmark_cell.Value.Item2);
+
+                var connecteds = GetConnectedCells(landmark_cell.Key);
+
+                foreach (var connected in connecteds)
+                {
+                    connected.InvisWall(GetDir(connected, landmark_cell.Key));
+                }
+            }
+
+            landmark.Delete();
         }
+        else
+        {
+            var cells = GetConnectedCells(cell);
 
-        cell.Delete();
-        maze_grid[pos.x, pos.y] = null;
+            foreach (var new_cell in cells)
+            {
+                new_cell.InvisWall(GetDir(new_cell, cell));
+            }
 
-        return pos;
+            cell.OnDeleted += CellDeleted;
+            _ = cell.Delete(pos.x, pos.y);
+        }
+    }
+
+    private void CellDeleted(MazeCellScript cellScript, int posX, int posY)
+    {
+        maze_grid[posX, posY] = null;
+        cellScript.OnDeleted -= CellDeleted;
     }
 
     private void SpawnLandmark(int x, int y)
@@ -831,6 +865,15 @@ public class GeneratorScript : MonoBehaviour
             }
 
             throw new InvalidOperatorException("No tiles to select", typeof(float));
+        }
+
+        public void RemoveTile(int x, int y)
+        {
+            if (dead[x, y]) return;
+
+            dead[x, y] = true;
+            dead_count++;
+            UpdateModifiedMap();
         }
 
         private float DistanceBetween(float change_x, float change_y)

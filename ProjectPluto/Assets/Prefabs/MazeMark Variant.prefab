@@ -133,6 +133,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 3107949625669276440}
     m_Modifications:
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
+      propertyPath: floor
+      value: 
+      objectReference: {fileID: 3034231958227473323}
+    - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: ceiling
       value: 
       objectReference: {fileID: 7820359286283154415}
@@ -219,6 +223,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3107949625669276440}
     m_Modifications:
+    - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
+      propertyPath: floor
+      value: 
+      objectReference: {fileID: 3034231958227473323}
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: ceiling
       value: 
@@ -472,7 +480,17 @@ MonoBehaviour:
   cell_tl: {fileID: 3336696255093687631}
   cell_tr: {fileID: 6769893192162405557}
   ceiling: {fileID: 7820359286283154415}
+  floor: {fileID: 3034231958227473323}
+  cracked:
+  - {fileID: 21300000, guid: 541ef92095c1a384aa6d9b0807550b66, type: 3}
+  - {fileID: 21300000, guid: 844deef159a98d848bb9adab9dac9a34, type: 3}
+  - {fileID: 21300000, guid: a4fc7f6c6e86f324091f0cb6c64d1589, type: 3}
   curr_alpha: 1
+--- !u!212 &3034231958227473323 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 1263763517771015822, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
+  m_PrefabInstance: {fileID: 4292506428194665765}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3107949625669276440 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1203495111087679037, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
@@ -491,6 +509,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3107949625669276440}
     m_Modifications:
+    - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
+      propertyPath: floor
+      value: 
+      objectReference: {fileID: 3034231958227473323}
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: ceiling
       value: 
@@ -578,6 +600,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3107949625669276440}
     m_Modifications:
+    - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
+      propertyPath: floor
+      value: 
+      objectReference: {fileID: 3034231958227473323}
     - target: {fileID: 524563246339757257, guid: 48979d54750ebe64c960ef19509ecbd1, type: 3}
       propertyPath: ceiling
       value: 

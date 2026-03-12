@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -9,6 +10,10 @@ public class LandmarkCellScript : MonoBehaviour
     [SerializeField] MazeCellScript cell_tr;
 
     [SerializeField] SpriteRenderer ceiling;
+    [SerializeField] SpriteRenderer floor;
+
+    [SerializeField] Sprite[] cracked;
+
     public float curr_alpha = 1f;
 
     private GeneratorScript maze;
@@ -33,6 +38,63 @@ public class LandmarkCellScript : MonoBehaviour
         cell_br.See(percent_fade);
         cell_tl.See(percent_fade);
         cell_tr.See(percent_fade);
+    }
+
+    public async void Delete()
+    {
+        int rand = UnityEngine.Random.Range(0, cracked.Length);
+
+        floor.sprite = cracked[rand];
+        ceiling.sprite = cracked[rand];
+
+        try
+        {
+            await Awaitable.WaitForSecondsAsync(2f, destroyCancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        _ = cell_bl.Delete(maze_x, maze_y);
+        _ = cell_br.Delete(maze_x + 1, maze_y);
+        _ = cell_tl.Delete(maze_x + 1, maze_y + 1);
+        _ = cell_tr.Delete(maze_x, maze_y + 1);
+
+        Destroy(gameObject);
+    }
+
+    public MazeCellScript GetCell(int x, int y)
+    {
+        if (x == 1)
+        {
+            if (y == 1)
+            {
+                return cell_bl;
+            }
+            else if (y == 2)
+            {
+                return cell_tl;
+            }
+        }
+        else if (x == 2)
+        {
+            if (y == 1)
+            {
+                return cell_br;
+            }
+            else if (y == 2)
+            {
+                return cell_tr;
+            }
+        }
+
+        return null;
+    }
+
+    public (int x, int y) GetXY()
+    {
+        return (maze_x, maze_y);
     }
 
     public void Initialize(GeneratorScript new_maze)
