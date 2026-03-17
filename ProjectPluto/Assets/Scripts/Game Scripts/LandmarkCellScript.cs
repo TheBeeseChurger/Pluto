@@ -58,8 +58,8 @@ public class LandmarkCellScript : MonoBehaviour
 
         _ = cell_bl.Delete(maze_x, maze_y);
         _ = cell_br.Delete(maze_x + 1, maze_y);
-        _ = cell_tl.Delete(maze_x + 1, maze_y + 1);
-        _ = cell_tr.Delete(maze_x, maze_y + 1);
+        _ = cell_tr.Delete(maze_x + 1, maze_y + 1);
+        _ = cell_tl.Delete(maze_x, maze_y + 1);
 
         Destroy(gameObject);
     }

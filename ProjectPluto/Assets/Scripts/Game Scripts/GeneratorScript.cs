@@ -150,6 +150,12 @@ public class GeneratorScript : MonoBehaviour
 
             foreach (var cell in newCells)
             {
+                if (cell == null)
+                {
+                    Debug.LogError("Trying to BFS an empty cell. Adjacent Cell: " + CellMazePos(currentCell));
+                    continue;
+                }
+
                 var position = CellMazePos(cell);
                 int x = (int)position.x;
                 int y = (int)position.y;
@@ -320,9 +326,9 @@ public class GeneratorScript : MonoBehaviour
 
     public void DeleteRandomCell()
     {
-        var pos = degen.GetRndTile();
+        var (x, y) = degen.GetRndTile();
 
-        var cell = maze_grid[pos.x, pos.y];
+        var cell = maze_grid[x, y];
 
         if (cell.IsLandmarkCell)
         {
@@ -337,36 +343,31 @@ public class GeneratorScript : MonoBehaviour
 
             foreach (var landmark_cell in cells)
             {
+                var (lx, ly) = landmark.GetXY();
                 landmark_cell.Key.OnDeleted += CellDeleted;
-                degen.RemoveTile(landmark_cell.Value.Item1, landmark_cell.Value.Item2);
-
-                var connecteds = GetConnectedCells(landmark_cell.Key);
-
-                foreach (var connected in connecteds)
-                {
-                    connected.InvisWall(GetDir(connected, landmark_cell.Key));
-                }
+                degen.RemoveTile(lx + landmark_cell.Value.Item1, ly + landmark_cell.Value.Item2);
             }
 
             landmark.Delete();
         }
         else
         {
-            var cells = GetConnectedCells(cell);
-
-            foreach (var new_cell in cells)
-            {
-                new_cell.InvisWall(GetDir(new_cell, cell));
-            }
-
             cell.OnDeleted += CellDeleted;
-            _ = cell.Delete(pos.x, pos.y);
+            _ = cell.Delete(x, y);
         }
     }
 
     private void CellDeleted(MazeCellScript cellScript, int posX, int posY)
     {
         maze_grid[posX, posY] = null;
+
+        var cells = GetConnectedCells(cellScript);
+
+        foreach (var new_cell in cells)
+        {
+            new_cell.InvisWall(GetDir(new_cell, cellScript));
+        }
+
         cellScript.OnDeleted -= CellDeleted;
     }
 

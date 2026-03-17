@@ -209,6 +209,7 @@ public class MazeCellScript : MonoBehaviour
         }
         catch (OperationCanceledException)
         {
+            Debug.Log("Cell was destroyed before cracked state was finished.");
             return;
         }
 

@@ -107,10 +107,11 @@ public class AIScript : MonoBehaviour
 
         if (!IsMoving)
         {
-            IsMoving = true;
-
-            starting_pos = transform.position;
-            PickNewDirection();
+            if (PickNewDirection())
+            {
+                IsMoving = true;
+                starting_pos = transform.position;
+            }
         }
     }
 
@@ -121,9 +122,9 @@ public class AIScript : MonoBehaviour
         if (IsMoving)
         {
             Vector2 new_pos;
-            if (run_dir == Vector2.zero) new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, move_speed * Time.fixedDeltaTime);
-            else new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, run_speed * Time.fixedDeltaTime);
-            new_pos *= GameManager.gameTimeScale;
+            if (run_dir == Vector2.zero) new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, move_speed * Time.fixedDeltaTime * GameManager.gameTimeScale);
+            else new_pos = Vector2.MoveTowards(transform.position, starting_pos + move_dir, run_speed * Time.fixedDeltaTime * GameManager.gameTimeScale);
+
             transform.position = new Vector3(new_pos.x, new_pos.y, -1f);
 
             Debug.DrawLine(transform.position, starting_pos + move_dir);
@@ -150,20 +151,27 @@ public class AIScript : MonoBehaviour
             case AIType.evil:
                 if (collision.collider.CompareTag("Player") || collision.collider.CompareTag("Player2"))
                 {
-                    gm.EndGame();
+                    gm.EndGame(collision.collider.transform.position);
                 }
 
                 break;
         }
     }
 
-    private void PickNewDirection()
+    private bool PickNewDirection()
     {
         List<Vector2> poss_dirs = gm.PossibleDirections(transform.position);
 
         if (CurrentNearestCell(last_seen_pos) == CurrentNearestCell(transform.position))
         {
             IsChasing = false;
+        }
+
+        if (poss_dirs.Count <= 0)
+        {
+            horizontal = 0;
+            vertical = 0;
+            return false;
         }
 
         if (!IsChasing) ChangeMode(poss_dirs);
@@ -224,6 +232,7 @@ public class AIScript : MonoBehaviour
         }
 
         move_dir = new Vector2(horizontal, vertical);
+        return true;
     }
 
     private void ChangeMode(IEnumerable<Vector2> dirs)

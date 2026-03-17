@@ -24,6 +24,9 @@ public class CallIndicatorScript : MonoBehaviour
     [SerializeField] private Sprite[] fillIndicators;
     [SerializeField] private Sprite emptyIndicator;
 
+    private RectTransform parentRect;
+    private Canvas canvas;
+
     private Image image;
     private Timer anim_timer;
 
@@ -39,6 +42,13 @@ public class CallIndicatorScript : MonoBehaviour
         cam = Camera.main;
         player = player1;
         currentSignalSource = player2;
+
+        parentRect = transform.parent.GetComponent<RectTransform>();
+        canvas = parentRect.GetComponent<Canvas>();
+        while (canvas != null && !canvas.isRootCanvas)
+        {
+            canvas = canvas.transform.parent.GetComponent<Canvas>();
+        }
 
         image = GetComponent<Image>();
 
@@ -112,15 +122,22 @@ public class CallIndicatorScript : MonoBehaviour
             ChangeState(IndicatorState.Edge);
         }
 
-            float clampedX = Mathf.Clamp(projScreenPos.x, minX, maxX);
+        float clampedX = Mathf.Clamp(projScreenPos.x, minX, maxX);
         float clampedY = Mathf.Clamp(projScreenPos.y, minY, maxY);
 
-        Vector3 targetScreenPos = new(clampedX - xOffset, clampedY - yOffset, 0f);
+        Vector2 targetScreenPos = new(clampedX - xOffset, clampedY - yOffset);
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            parentRect,
+            targetScreenPos,
+            cam,
+            out Vector2 localPoint
+        );
 
         Vector3 dir = player.position - currentSignalSource.position;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
-        transform.SetLocalPositionAndRotation(targetScreenPos, Quaternion.Euler(0, 0, angle + 45f));
+        transform.SetLocalPositionAndRotation(localPoint, Quaternion.Euler(0, 0, angle + 45f));
     }
 
     private void ChangeState(IndicatorState state)
